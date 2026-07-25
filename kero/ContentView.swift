@@ -241,24 +241,30 @@ private struct SessionTabsView: View {
                 HStack(spacing: 8) {
                     ForEach(TabCategory.groups(project.tabs, by: \.category), id: \.category) { group in
                         let isCollapsed = collapsedCategories.contains(group.category)
-                        HStack(spacing: 1) {
+                        HStack(spacing: 2) {
                             categoryHeader(
                                 group.category,
                                 count: group.values.count,
                                 containsSelection: group.values.contains { $0.id == project.selectedTabID }
                             )
                             if !isCollapsed {
+                                Rectangle()
+                                    .fill(Color.primary.opacity(0.16))
+                                    .frame(width: 1, height: 14)
+                                    .accessibilityHidden(true)
                                 ForEach(group.values) { tab in
                                     tabItem(tab)
                                 }
                             }
                         }
-                        .padding(isCollapsed ? 0 : 2)
+                        .padding(2)
                         .background {
-                            if !isCollapsed {
-                                RoundedRectangle(cornerRadius: 7)
-                                    .fill(Color.primary.opacity(0.035))
-                            }
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(
+                                    isCollapsed
+                                        ? Color.primary.opacity(0.07)
+                                        : Color(nsColor: Theme.accent).opacity(0.11)
+                                )
                         }
                     }
                 }
@@ -348,10 +354,6 @@ private struct SessionTabsView: View {
             .padding(.horizontal, 7)
             .padding(.vertical, 5)
             .contentShape(RoundedRectangle(cornerRadius: 5))
-            .background {
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.primary.opacity(isCollapsed ? 0.07 : 0.09))
-            }
         }
         .buttonStyle(.plain)
         .id(category)
@@ -621,11 +623,6 @@ private struct TabItemChrome: View {
     var body: some View {
         Button(action: select) {
             HStack(spacing: 5) {
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 8, weight: .bold))
-                        .accessibilityHidden(true)
-                }
                 Image(systemName: systemImage)
                     .font(.system(size: 9, weight: .medium))
                     .foregroundStyle(isSelected ? AnyShapeStyle(Color(nsColor: Theme.accent)) : AnyShapeStyle(.tertiary))
@@ -673,7 +670,11 @@ private struct TabItemChrome: View {
         .frame(maxWidth: 220)
         .background(
             RoundedRectangle(cornerRadius: 6)
-                .fill(isSelected ? Color.primary.opacity(0.09) : (isHovering ? Color.primary.opacity(0.04) : .clear))
+                .fill(
+                    isSelected
+                        ? Color(nsColor: Theme.background)
+                        : (isHovering ? Color.primary.opacity(0.07) : .clear)
+                )
         )
         .onHover { isHovering = $0 }
     }

@@ -22,7 +22,6 @@ nonisolated enum AgentKind: String {
         "codex": .codex,
         "gemini": .gemini,
         "pi": .pi,
-        "agent": .cursorAgent,
         "cursor-agent": .cursorAgent,
         "opencode": .openCode,
         "copilot": .copilot,
@@ -34,7 +33,10 @@ nonisolated enum AgentKind: String {
 
     fileprivate static func classify(_ member: TerminalProcessSnapshot.Member) -> Self? {
         let executable = member.argv0.map(basename) ?? ""
-        if let kind = aliases[member.name] ?? aliases[executable] { return kind }
+        if let kind = aliases[member.name]
+            ?? aliases[executable]
+            ?? member.argv0.flatMap(resolvedAlias)
+        { return kind }
 
         guard isWrapper(member.name) || isWrapper(executable),
               let arguments = member.argv?.dropFirst(),
@@ -47,6 +49,13 @@ nonisolated enum AgentKind: String {
 
     private static func basename(_ path: String) -> String {
         (path as NSString).lastPathComponent
+    }
+
+    /// Cursor ships a generic `agent` symlink. Only trust it when its actual
+    /// target has a known agent name; `agent` by itself is far too broad.
+    private static func resolvedAlias(_ path: String) -> Self? {
+        guard path.contains("/") else { return nil }
+        return aliases[URL(fileURLWithPath: path).resolvingSymlinksInPath().lastPathComponent]
     }
 
     private static func isWrapper(_ name: String) -> Bool {

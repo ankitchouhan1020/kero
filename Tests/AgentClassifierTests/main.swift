@@ -23,7 +23,18 @@ for (alias, kind) in direct {
     assert(snapshot([(20, alias, ["/usr/local/bin/\(alias)"])]).agentKind == kind)
 }
 
-assert(snapshot([(20, "agent", ["agent"])]).agentKind == .cursorAgent)
+assert(snapshot([(20, "agent", ["agent"])]).agentKind == nil)
+let symlinkDirectory = FileManager.default.temporaryDirectory
+    .appendingPathComponent("sora-agent-classifier-\(UUID().uuidString)")
+try FileManager.default.createDirectory(at: symlinkDirectory, withIntermediateDirectories: true)
+let cursorExecutable = symlinkDirectory.appendingPathComponent("cursor-agent")
+let genericAgentLink = symlinkDirectory.appendingPathComponent("agent")
+try Data().write(to: cursorExecutable)
+try FileManager.default.createSymbolicLink(
+    atPath: genericAgentLink.path, withDestinationPath: cursorExecutable.path
+)
+defer { try? FileManager.default.removeItem(at: symlinkDirectory) }
+assert(snapshot([(20, "agent", [genericAgentLink.path])]).agentKind == .cursorAgent)
 assert(snapshot([(20, "github-copilot", ["github-copilot"])]).agentKind == .copilot)
 assert(snapshot([(20, "kimi-cli", ["kimi-cli"])]).agentKind == .kimi)
 assert(snapshot([(20, "node", ["node", "/opt/homebrew/bin/claude"])]).agentKind == .claude)
