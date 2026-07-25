@@ -144,6 +144,31 @@ final class PaneTab: nonisolated ObservableObject, nonisolated Identifiable {
         allContents.compactMap { if case .diff(let diff) = $0 { return diff }; return nil }
     }
 
+    var category: TabCategory {
+        let hasAgent = sessions.contains {
+            if case .agent = $0.activity { return true }
+            return false
+        }
+        let focusedIsFileOrDiff: Bool
+        let focusedRunsCommand: Bool
+        switch focusedContent {
+        case .file, .diff:
+            focusedIsFileOrDiff = true
+            focusedRunsCommand = false
+        case .session(let session):
+            focusedIsFileOrDiff = false
+            focusedRunsCommand = session.activity == .command
+        case nil:
+            focusedIsFileOrDiff = false
+            focusedRunsCommand = false
+        }
+        return TabCategory.derive(
+            hasAgentSession: hasAgent,
+            focusedIsFileOrDiff: focusedIsFileOrDiff,
+            focusedTerminalRunsCommand: focusedRunsCommand
+        )
+    }
+
     var hasMultiplePanes: Bool { allPanes.count > 1 }
 
     /// Splitting is disallowed while a diff is focused: diffs stay in their own
