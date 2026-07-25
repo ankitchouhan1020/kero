@@ -88,7 +88,7 @@ final class AppSettings: nonisolated ObservableObject {
     }
 
     /// Allows Sora's bundled, signed helper to control visible projects and
-    /// terminals. Off by default because terminal input can execute commands.
+    /// terminals. Enabled by default and can be disabled in Settings.
     @Published var allowLocalAutomation: Bool {
         didSet {
             save()
@@ -112,7 +112,7 @@ final class AppSettings: nonisolated ObservableObject {
         fontThicken = toml["font-thicken"]?.bool ?? false
         wrapLines = toml["editor.wrap-lines"]?.bool ?? false
         restoreTerminalHistory = toml["terminal.restore-history"]?.bool ?? false
-        allowLocalAutomation = toml["automation.enabled"]?.bool ?? false
+        allowLocalAutomation = toml["automation.enabled"]?.bool ?? true
         applyAppearance()
         reloadThemeSelection()
         if existing == nil { save() }
@@ -154,7 +154,7 @@ final class AppSettings: nonisolated ObservableObject {
         themeLight = Theme.defaultLightThemeName
         wrapLines = false
         restoreTerminalHistory = false
-        allowLocalAutomation = false
+        allowLocalAutomation = true
     }
 
     private func save() {
@@ -183,9 +183,7 @@ final class AppSettings: nonisolated ObservableObject {
         if restoreTerminalHistory {
             lines.append("terminal.restore-history = true")
         }
-        if allowLocalAutomation {
-            lines.append("automation.enabled = true")
-        }
+        lines.append("automation.enabled = \(allowLocalAutomation)")
         let dir = Self.configURL.deletingLastPathComponent()
         do {
             try FileManager.default.createDirectory(

@@ -150,8 +150,8 @@ const FEATURES: { group: string; rows: Row[] }[] = [
         detail: 'automated commands run in ordinary Sora tabs, where you can watch, inspect, or take over',
       },
       {
-        name: 'Local and opt-in',
-        detail: 'disabled by default; when enabled, a signed bundled helper connects over a private per-user socket',
+        name: 'Local and controllable',
+        detail: 'enabled by default, easy to switch off, and secured through a signed helper on a private per-user socket',
       },
     ],
   },
@@ -222,7 +222,7 @@ const FAQ: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'Can coding agents control Sora?',
-    a: 'Yes. Enable local automation in Settings to use the bundled sora command or its MCP server. Commands stay visible in normal terminal tabs, and no network port or background daemon is opened.',
+    a: 'Yes. Use the bundled sora command or its MCP server; local automation can be disabled in Settings. Commands stay visible in normal terminal tabs, and no network port or background daemon is opened.',
   },
   {
     q: 'What happens to my sessions when I quit?',

@@ -16,7 +16,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Sora is a native terminal workspace for macOS with projects, panes, files, git, and opt-in local automation for scripts and coding agents.",
+          "Sora is a native terminal workspace for macOS with projects, panes, files, git, and local automation for scripts and coding agents.",
       },
       { name: "theme-color", content: "#0d1117" },
     ],

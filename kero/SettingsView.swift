@@ -142,7 +142,7 @@ struct SettingsView: View {
                         && settings.themeLight == Theme.defaultLightThemeName
                         && !settings.wrapLines
                         && !settings.restoreTerminalHistory
-                        && !settings.allowLocalAutomation)
+                        && settings.allowLocalAutomation)
                 }
             }
         }

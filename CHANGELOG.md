@@ -12,6 +12,7 @@ set in the Xcode project.
 
 ## [unrelease]
 
+- Enable the bundled `sora` CLI and MCP server by default; local automation can still be switched off in Settings
 - Refresh the Sora website with local automation details and deploy it to the maintainer-owned Cloudflare Worker
 
 ## [0.1.27]
