@@ -12,6 +12,7 @@ A native terminal workspace for macOS.
 - Git intergration
 - Group by projects
 - File tree
+- Local automation through the bundled `sora` CLI and MCP server
 
 ## Download
 
@@ -21,15 +22,6 @@ Or with Homebrew:
 
 ```sh
 brew install ankitchouhan1020/tap/sora
-```
-
-Homebrew installs both the app and the bundled `sora` automation command. Local automation is disabled by default; enable it in **Sora → Settings → Automation**.
-
-Without Homebrew, invoke the same helper directly:
-
-```sh
-/Applications/Sora.app/Contents/Helpers/sora --help
-/Applications/Sora.app/Contents/Helpers/sora mcp
 ```
 
 ## Contributing
