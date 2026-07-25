@@ -20,6 +20,7 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     @Published var title: String
     @Published var workingDirectory: String?
     @Published var hasExited = false
+    @Published private(set) var activity: TerminalActivity = .terminal
 
     let terminalView: KeroTerminalView
     let overlayScrollbar = OverlayScrollbarView()
@@ -41,6 +42,8 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     private var lastHistorySnapshot: String?
     private var pendingCommands: [String] = []
     private var commandFlushTask: Task<Void, Never>?
+    private var activityMonitorTask: Task<Void, Never>?
+    private var activityTracker = TerminalActivityTracker()
     private var isTerminating = false
 
     init(initialDirectory: String? = nil, restoredHistory: String? = nil) {
@@ -82,9 +85,11 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
         terminalView.controller = controller
         installOverlayScrollbar()
         applyTheme()
+        startActivityMonitoring()
     }
 
     deinit {
+        activityMonitorTask?.cancel()
         if let launchDirectoryURL {
             try? FileManager.default.removeItem(at: launchDirectoryURL)
         }
@@ -130,6 +135,8 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     /// or been force-stopped. Releasing AppTerminalView first can make
     /// libghostty wait synchronously for a process that ignored SIGHUP.
     private func beginTeardown(processAlive: Bool, notifyExit: Bool) {
+        activityMonitorTask?.cancel()
+        activityMonitorTask = nil
         if processAlive {
             _ = shellPid // Cache it before `hasExited` changes.
             signalTerminalJob(SIGHUP)
@@ -171,6 +178,29 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     private func removeLaunchArtifacts() {
         guard let launchDirectoryURL else { return }
         try? FileManager.default.removeItem(at: launchDirectoryURL)
+    }
+
+    private func startActivityMonitoring() {
+        activityMonitorTask = Task { @MainActor [weak self] in
+            while let self, !Task.isCancelled, !self.hasExited {
+                if let shellPID = self.shellPid {
+                    let foregroundPID = self.terminalView.foregroundPid
+                    let snapshot = await Task.detached(priority: .utility) {
+                        TerminalProcessSnapshot.capture(shellPID: shellPID)
+                    }.value
+                    guard !Task.isCancelled, !self.hasExited else { return }
+                    let observed = TerminalActivity.classify(
+                        shellPID: shellPID,
+                        foregroundPID: foregroundPID,
+                        snapshot: snapshot
+                    )
+                    if let activity = self.activityTracker.observe(observed) {
+                        self.activity = activity
+                    }
+                }
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+        }
     }
 
     /// Short label for the sidebar: the tail of the current directory, if known.

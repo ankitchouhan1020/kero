@@ -6,7 +6,7 @@
 import Darwin
 import Foundation
 
-enum AgentKind: String {
+nonisolated enum AgentKind: String {
     case claude
     case codex
     case gemini
@@ -55,8 +55,45 @@ enum AgentKind: String {
     }
 }
 
+enum TerminalActivity: Equatable {
+    case agent(AgentKind)
+    case command
+    case terminal
+
+    static func classify(
+        shellPID: pid_t,
+        foregroundPID: pid_t?,
+        snapshot: TerminalProcessSnapshot?
+    ) -> Self {
+        guard let foregroundPID, foregroundPID != shellPID else { return .terminal }
+        guard snapshot?.processGroupID == foregroundPID else { return .command }
+        return snapshot?.agentKind.map(Self.agent) ?? .command
+    }
+}
+
+/// Requires a stable second observation before publishing a transition. This
+/// hides short-lived process metadata races when jobs start and exit.
+struct TerminalActivityTracker {
+    private(set) var activity: TerminalActivity = .terminal
+    private var candidate: TerminalActivity?
+
+    mutating func observe(_ observed: TerminalActivity) -> TerminalActivity? {
+        guard observed != activity else {
+            candidate = nil
+            return nil
+        }
+        guard candidate == observed else {
+            candidate = observed
+            return nil
+        }
+        activity = observed
+        candidate = nil
+        return activity
+    }
+}
+
 /// Best-effort metadata for the process group currently owning a terminal.
-struct TerminalProcessSnapshot: Equatable {
+nonisolated struct TerminalProcessSnapshot: Equatable {
     struct Member: Equatable, Identifiable {
         var id: pid_t { pid }
         let pid: pid_t
