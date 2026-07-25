@@ -6,6 +6,55 @@
 import Darwin
 import Foundation
 
+enum AgentKind: String {
+    case claude
+    case codex
+    case gemini
+    case pi
+    case cursorAgent
+    case openCode
+    case copilot
+    case kimi
+    case amp
+
+    private static let aliases: [String: Self] = [
+        "claude": .claude,
+        "codex": .codex,
+        "gemini": .gemini,
+        "pi": .pi,
+        "agent": .cursorAgent,
+        "cursor-agent": .cursorAgent,
+        "opencode": .openCode,
+        "copilot": .copilot,
+        "github-copilot": .copilot,
+        "kimi": .kimi,
+        "kimi-cli": .kimi,
+        "amp": .amp,
+    ]
+
+    fileprivate static func classify(_ member: TerminalProcessSnapshot.Member) -> Self? {
+        let executable = member.argv0.map(basename) ?? ""
+        if let kind = aliases[member.name] ?? aliases[executable] { return kind }
+
+        guard isWrapper(member.name) || isWrapper(executable),
+              let arguments = member.argv?.dropFirst(),
+              let first = arguments.first
+        else { return nil }
+        let wrapped = first == "--" ? arguments.dropFirst().first : first
+        guard let wrapped, !wrapped.hasPrefix("-") else { return nil }
+        return aliases[basename(wrapped)]
+    }
+
+    private static func basename(_ path: String) -> String {
+        (path as NSString).lastPathComponent
+    }
+
+    private static func isWrapper(_ name: String) -> Bool {
+        ["node", "bun", "python", "python3", "sh", "bash", "zsh", "fish", "dash"]
+            .contains(name) || name.hasPrefix("python3.")
+    }
+}
+
 /// Best-effort metadata for the process group currently owning a terminal.
 struct TerminalProcessSnapshot: Equatable {
     struct Member: Equatable, Identifiable {
@@ -19,6 +68,12 @@ struct TerminalProcessSnapshot: Equatable {
 
     let processGroupID: pid_t
     let members: [Member]
+
+    var agentKind: AgentKind? {
+        let leader = members.first { $0.pid == processGroupID }
+        return ([leader].compactMap { $0 } + members.filter { $0.pid != processGroupID })
+            .lazy.compactMap(AgentKind.classify).first
+    }
 
     private static let maximumProcessCount = 65_536
     private static let maximumArgumentBytes = 1_048_576
