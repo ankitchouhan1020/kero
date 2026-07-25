@@ -14,7 +14,9 @@ struct RightSidebarView: View {
     @ObservedObject private var themeChanges = Theme.changes
     @StateObject private var fileTree = FileTreeModel()
     @StateObject private var git = GitStatusModel()
+    @StateObject private var beads = BeadsModel()
     @StateObject private var info = SessionInfoModel()
+    @ObservedObject private var settings = AppSettings.shared
     @AppStorage("rightSidebarWidth") private var width: Double = 240
 
     private let refreshTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
@@ -63,6 +65,8 @@ struct RightSidebarView: View {
                                 )
                             }
                         )
+                    case .beads:
+                        BeadsPanel(model: beads, session: manager.selectedSession)
                     case .info:
                         InfoPanel(model: info, session: manager.selectedSession)
                     }
@@ -100,6 +104,7 @@ struct RightSidebarView: View {
             tabButton(.info, systemImage: "info.circle", title: "Info", help: "Info (⇧⌘I)")
             tabButton(.files, systemImage: "folder", title: "Files", help: "Files (⇧⌘E)")
             tabButton(.git, systemImage: "arrow.triangle.branch", title: "Git", help: "Git (⇧⌘G)")
+            tabButton(.beads, systemImage: "circle.grid.cross", title: "Beads", help: "Beads")
         }
         .padding(.horizontal, 8)
         .padding(.top, 12)
@@ -111,12 +116,14 @@ struct RightSidebarView: View {
         return Button {
             manager.panelTab = panel
         } label: {
-            HStack(spacing: 5) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 5) {
+                    Image(systemName: systemImage)
+                    Text(title)
+                }
                 Image(systemName: systemImage)
-                    .font(.system(size: 10, weight: .medium))
-                Text(title)
-                    .font(.system(size: 11, weight: isActive ? .medium : .regular))
             }
+            .font(.system(size: 10, weight: isActive ? .medium : .regular))
             .foregroundStyle(isActive ? .primary : .tertiary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 5)
@@ -146,6 +153,7 @@ struct RightSidebarView: View {
         switch manager.panelTab {
         case .files: fileTree.sync(root: root)
         case .git: git.sync(root: root)
+        case .beads: beads.sync(root: root, executablePath: settings.beadsExecutable)
         case .info:
             info.sync(
                 root: cwd, projectRoot: root, projectRootIsAutomatic: isAutoRoot,

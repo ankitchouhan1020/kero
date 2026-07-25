@@ -109,6 +109,13 @@ struct SettingsView: View {
                 Toggle("Wrap lines to editor width", isOn: $settings.wrapLines)
             }
 
+            Section("Beads") {
+                TextField("bd executable path", text: $settings.beadsExecutable)
+                Text("Optional. Leave empty to discover Homebrew and PATH installations automatically.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Automation") {
                 Toggle("Allow local automation", isOn: $settings.allowLocalAutomation)
                 Text("Lets Sora’s bundled CLI and MCP helper open projects and control visible terminals.")
@@ -142,6 +149,7 @@ struct SettingsView: View {
                         && settings.themeLight == Theme.defaultLightThemeName
                         && !settings.wrapLines
                         && !settings.restoreTerminalHistory
+                        && settings.beadsExecutable.isEmpty
                         && settings.allowLocalAutomation)
                 }
             }

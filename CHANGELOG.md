@@ -12,6 +12,8 @@ set in the Xcode project.
 
 ## [unrelease]
 
+- Add a project-scoped Beads panel for reviewing, filtering, claiming, closing, reopening, and handing agent tasks back to the terminal
+
 ## [0.1.28]
 
 - Group tabs into calm, connected Agents, Files, Commands, and Terminals sections that collapse without disrupting tab navigation or reordering

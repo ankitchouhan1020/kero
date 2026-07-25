@@ -13,6 +13,7 @@ import SwiftUI
 enum RightPanel: String, Codable {
     case files
     case git
+    case beads
     case info
 }
 

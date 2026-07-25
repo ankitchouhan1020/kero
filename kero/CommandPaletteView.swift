@@ -150,6 +150,9 @@ struct CommandPaletteView: View {
             PaletteCommand(id: "toggle-git", title: "Toggle Git Panel", systemImage: "arrow.triangle.branch", shortcut: "⇧⌘G") {
                 manager.togglePanel(.git)
             },
+            PaletteCommand(id: "toggle-beads", title: "Toggle Beads Panel", systemImage: "circle.grid.cross", shortcut: nil) {
+                manager.togglePanel(.beads)
+            },
             PaletteCommand(id: "toggle-info", title: "Toggle Info Panel", systemImage: "info.circle", shortcut: "⇧⌘I") {
                 manager.togglePanel(.info)
             },

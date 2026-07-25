@@ -87,6 +87,12 @@ final class AppSettings: nonisolated ObservableObject {
         didSet { save() }
     }
 
+    /// Optional explicit path to the Beads CLI. Empty discovers Homebrew and
+    /// PATH locations, which covers both Finder and terminal launches.
+    @Published var beadsExecutable: String {
+        didSet { save() }
+    }
+
     /// Allows Sora's bundled, signed helper to control visible projects and
     /// terminals. Enabled by default and can be disabled in Settings.
     @Published var allowLocalAutomation: Bool {
@@ -112,6 +118,7 @@ final class AppSettings: nonisolated ObservableObject {
         fontThicken = toml["font-thicken"]?.bool ?? false
         wrapLines = toml["editor.wrap-lines"]?.bool ?? false
         restoreTerminalHistory = toml["terminal.restore-history"]?.bool ?? false
+        beadsExecutable = toml["beads.executable"]?.string ?? ""
         allowLocalAutomation = toml["automation.enabled"]?.bool ?? true
         applyAppearance()
         reloadThemeSelection()
@@ -154,6 +161,7 @@ final class AppSettings: nonisolated ObservableObject {
         themeLight = Theme.defaultLightThemeName
         wrapLines = false
         restoreTerminalHistory = false
+        beadsExecutable = ""
         allowLocalAutomation = true
     }
 
@@ -182,6 +190,9 @@ final class AppSettings: nonisolated ObservableObject {
         }
         if restoreTerminalHistory {
             lines.append("terminal.restore-history = true")
+        }
+        if !beadsExecutable.isEmpty {
+            lines.append("beads.executable = \(TOML.quote(beadsExecutable))")
         }
         lines.append("automation.enabled = \(allowLocalAutomation)")
         let dir = Self.configURL.deletingLastPathComponent()

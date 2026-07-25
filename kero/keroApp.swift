@@ -196,6 +196,11 @@ private struct KeroCommands: Commands {
             .keyboardShortcut("g", modifiers: [.command, .shift])
             .disabled(manager?.selectedProject == nil)
 
+            Button("Toggle Beads Panel") {
+                manager?.togglePanel(.beads)
+            }
+            .disabled(manager?.selectedProject == nil)
+
             Button("Toggle Info Panel") {
                 manager?.togglePanel(.info)
             }
