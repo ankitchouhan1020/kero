@@ -18,6 +18,9 @@ const GITHUB_URL = 'https://github.com/ankitchouhan1020/sora'
 // Cask lives in ankitchouhan1020/homebrew-tap, so the tap has to be named explicitly.
 // `--cask` is optional — brew falls back to casks, and the tap has no `sora` formula.
 const BREW_COMMAND = 'brew install ankitchouhan1020/tap/sora'
+const MCP_COMMAND = '/opt/homebrew/bin/sora mcp'
+const AGENT_PROMPT =
+  'Configure Sora for this agent. If MCP is supported, add a stdio server with command /opt/homebrew/bin/sora and argument mcp. Otherwise, including in Pi, use the sora CLI directly. Verify the connection with sora status.'
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
@@ -327,6 +330,16 @@ function Home() {
       </section>
 
       <section className="flex flex-col gap-3.5">
+        <SectionHeading>Connect an AI agent</SectionHeading>
+        <p className="text-muted-foreground">
+          MCP-capable clients launch Sora over stdio. Pi can use the same bundled CLI directly.
+        </p>
+        <CopyCommand command={MCP_COMMAND} />
+        <p className="text-[13px] text-muted-foreground">Or give your agent this:</p>
+        <CopyCommand command={AGENT_PROMPT} wrap />
+      </section>
+
+      <section className="flex flex-col gap-3.5">
         <SectionHeading>Shortcuts</SectionHeading>
         <ul className="grid list-none gap-2 p-0">
           {SHORTCUTS.map((row) => (
@@ -389,11 +402,10 @@ function SectionHeading({ children }: { children: ReactNode }) {
 }
 
 /**
- * The Homebrew one-liner with a copy button, sharing the download button's
- * chrome. The command stays selectable so it's still usable if the Clipboard
- * API isn't available (insecure context, denied permission).
+ * A copyable command or wrapped prompt. Text stays selectable when the
+ * Clipboard API is unavailable (insecure context or denied permission).
  */
-function CopyCommand({ command }: { command: string }) {
+function CopyCommand({ command, wrap = false }: { command: string; wrap?: boolean }) {
   const [copied, setCopied] = useState(false)
   const commandRef = useRef<HTMLSpanElement>(null)
 
@@ -421,18 +433,33 @@ function CopyCommand({ command }: { command: string }) {
   }
 
   return (
-    <div className="flex max-w-full items-stretch self-start overflow-hidden rounded-[9px] border border-border bg-card">
-      <code className="flex min-w-0 items-center gap-2 overflow-x-auto px-4 py-[7px] whitespace-pre">
-        <span aria-hidden className="shrink-0 text-muted-foreground select-none">
-          $
-        </span>
+    <div
+      className={cn(
+        'flex max-w-full items-stretch self-start overflow-hidden rounded-[9px] border border-border bg-card',
+        wrap && 'w-full flex-col',
+      )}
+    >
+      <code
+        className={cn(
+          'flex min-w-0 gap-2 px-4 py-[7px]',
+          wrap ? 'whitespace-pre-wrap' : 'items-center overflow-x-auto whitespace-pre',
+        )}
+      >
+        {!wrap && (
+          <span aria-hidden className="shrink-0 text-muted-foreground select-none">
+            $
+          </span>
+        )}
         <span ref={commandRef}>{command}</span>
       </code>
       <button
         type="button"
         onClick={copy}
         aria-label={`Copy "${command}" to the clipboard`}
-        className="inline-flex shrink-0 items-center gap-2 border-l border-border px-3.5 text-muted-foreground transition-colors hover:bg-brand/8 hover:text-brand"
+        className={cn(
+          'inline-flex shrink-0 items-center justify-center gap-2 px-3.5 py-2 text-muted-foreground transition-colors hover:bg-brand/8 hover:text-brand',
+          wrap ? 'border-t border-border' : 'border-l border-border',
+        )}
       >
         <span
           aria-hidden
