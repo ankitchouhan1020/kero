@@ -11,6 +11,11 @@ import AppKit
 final class KeroApplicationDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.servicesProvider = self
+        SoraAutomationIPC.shared.setEnabled(AppSettings.shared.allowLocalAutomation)
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        SoraAutomationIPC.shared.stop()
     }
 
     /// Opens every directory Finder placed on the service pasteboard as a

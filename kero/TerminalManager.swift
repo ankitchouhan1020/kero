@@ -33,6 +33,8 @@ enum FindAction {
 /// project's selected session.
 @MainActor
 final class TerminalManager: nonisolated ObservableObject {
+    nonisolated let id = UUID()
+
     @Published var projects: [Project] = []
     @Published var selectedProjectID: UUID?
     @Published var isPanelVisible = false
@@ -172,16 +174,18 @@ final class TerminalManager: nonisolated ObservableObject {
     }
 
     /// Creates a project rooted at `directory`, with its first terminal
-    /// launched there. Used by Kero's Finder service.
-    private func newProject(directory: String) {
+    /// launched there. Used by Finder and Sora's local automation.
+    @discardableResult
+    func newProject(directory: String, name: String? = nil) -> Project {
         let project = makeProject(createInitialSession: false)
-        project.customName = URL(
+        project.customName = name ?? URL(
             fileURLWithPath: directory,
             isDirectory: true
         ).lastPathComponent
         project.customDirectory = directory
         project.newSession(directory: directory)
         insert(project)
+        return project
     }
 
     private func insert(_ project: Project) {
@@ -276,6 +280,20 @@ final class TerminalManager: nonisolated ObservableObject {
                 isOpeningWindow = false
             }
         }
+    }
+
+    /// Live windows exposed to Sora's local automation controller.
+    static var automationManagers: [TerminalManager] { registry }
+
+    static var automationTargetManager: TerminalManager? {
+        registry.first { $0.window === NSApp.keyWindow }
+            ?? registry.first { $0.window === NSApp.mainWindow }
+            ?? registry.last
+    }
+
+    func activateForAutomation() {
+        window?.makeKeyAndOrderFront(nil)
+        NSApp.activate()
     }
 
     private func makeProject(createInitialSession: Bool = true) -> Project {

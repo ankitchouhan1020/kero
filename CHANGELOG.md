@@ -10,6 +10,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Add a new
 `## [<version>]` section at the top for each release, matching the version you
 set in the Xcode project.
 
+## [unrelease]
+
+## [0.1.27]
+
+- Add opt-in local automation with a bundled `sora` CLI and MCP server for opening projects and controlling visible terminal tabs — without opening a network port
+
 ## [0.1.26]
 
 - The Processes list no longer shows `<defunct>` entries: those are exited children waiting to be reaped, not something you can see output from or kill

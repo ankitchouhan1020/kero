@@ -23,6 +23,15 @@ Or with Homebrew:
 brew install ankitchouhan1020/tap/sora
 ```
 
+Homebrew installs both the app and the bundled `sora` automation command. Local automation is disabled by default; enable it in **Sora → Settings → Automation**.
+
+Without Homebrew, invoke the same helper directly:
+
+```sh
+/Applications/Sora.app/Contents/Helpers/sora --help
+/Applications/Sora.app/Contents/Helpers/sora mcp
+```
+
 ## Contributing
 
 [CONTRIBUTING.md](CONTRIBUTING.md)

@@ -109,6 +109,13 @@ struct SettingsView: View {
                 Toggle("Wrap lines to editor width", isOn: $settings.wrapLines)
             }
 
+            Section("Automation") {
+                Toggle("Allow local automation", isOn: $settings.allowLocalAutomation)
+                Text("Lets Sora’s bundled CLI and MCP helper open projects and control visible terminals.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Updates") {
                 Toggle(
                     "Automatically check for updates",
@@ -134,7 +141,8 @@ struct SettingsView: View {
                         && settings.themeDark == Theme.defaultDarkThemeName
                         && settings.themeLight == Theme.defaultLightThemeName
                         && !settings.wrapLines
-                        && !settings.restoreTerminalHistory)
+                        && !settings.restoreTerminalHistory
+                        && !settings.allowLocalAutomation)
                 }
             }
         }

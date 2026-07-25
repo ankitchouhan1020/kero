@@ -76,11 +76,18 @@ export async function bumpCask(version: string, dmgPath?: string): Promise<boole
   if (!existsSync(caskPath)) throw new Error(`cask not found in ${TAP_REPO}: ${TAP_CASK}`);
   const before = await Bun.file(caskPath).text();
 
-  const after = before
+  const helperStanza = '  binary "#{appdir}/Sora.app/Contents/Helpers/sora"';
+  let after = before
     .replace(/^(\s*version\s+)"[^"]*"/m, `$1"${version}"`)
     .replace(/^(\s*sha256\s+)"[^"]*"/m, `$1"${digest}"`);
+  if (!after.includes(helperStanza)) {
+    after = after.replace(/^(\s*app\s+"Sora\.app")$/m, `$1\n${helperStanza}`);
+  }
   if (!after.includes(`"${version}"`) || !after.includes(`"${digest}"`)) {
     throw new Error(`could not find version/sha256 stanzas in ${TAP_CASK} — bump it by hand`);
+  }
+  if (!after.includes(helperStanza)) {
+    throw new Error(`could not add Sora's bundled helper to ${TAP_CASK}`);
   }
   if (after === before) {
     say(`${TAP_REPO} is already at ${version} — nothing to bump`);

@@ -39,6 +39,8 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     private var cachedShellPid: pid_t?
     private var lastScrollbar: TerminalScrollbar?
     private var lastHistorySnapshot: String?
+    private var pendingCommands: [String] = []
+    private var commandFlushTask: Task<Void, Never>?
     private var isTerminating = false
 
     init(initialDirectory: String? = nil, restoredHistory: String? = nil) {
@@ -119,6 +121,8 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     func terminate() {
         guard !hasExited, !isTerminating else { return }
         isTerminating = true
+        commandFlushTask?.cancel()
+        pendingCommands.removeAll()
         beginTeardown(processAlive: true, notifyExit: false)
     }
 
@@ -191,7 +195,32 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     }
 
     func sendCommand(_ text: String) {
-        terminalView.sendText(text)
+        if terminalView.foregroundPid != nil, pendingCommands.isEmpty {
+            terminalView.sendText(text)
+            return
+        }
+        pendingCommands.append(text)
+        flushPendingCommandsWhenReady()
+    }
+
+    private func flushPendingCommandsWhenReady() {
+        guard commandFlushTask == nil, !pendingCommands.isEmpty else { return }
+        commandFlushTask = Task { @MainActor [weak self] in
+            // ponytail: poll the backend's real PID readiness; replace only if
+            // libghostty gains a dedicated process-start callback.
+            for _ in 0..<250 {
+                guard let self, !Task.isCancelled, !self.hasExited else { return }
+                if self.terminalView.foregroundPid != nil {
+                    let commands = self.pendingCommands
+                    self.pendingCommands.removeAll()
+                    self.commandFlushTask = nil
+                    commands.forEach(self.terminalView.sendText)
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(20))
+            }
+            self?.commandFlushTask = nil
+        }
     }
 
     /// Clears the emulator's visible screen and scrollback, then asks the
@@ -455,6 +484,14 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
 }
 
 // MARK: - libghostty surface callbacks
+
+extension TerminalSession: TerminalSurfaceLifecycleDelegate {
+    func terminalDidAttachSurface(_ surface: TerminalSurface) {
+        flushPendingCommandsWhenReady()
+    }
+
+    func terminalDidDetachSurface() {}
+}
 
 extension TerminalSession: TerminalSurfaceTitleDelegate {
     func terminalDidChangeTitle(_ title: String) {
