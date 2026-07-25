@@ -238,16 +238,26 @@ private struct SessionTabsView: View {
         HStack(spacing: 4) {
             ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 3) {
+                HStack(spacing: 8) {
                     ForEach(TabCategory.groups(project.tabs, by: \.category), id: \.category) { group in
-                        categoryHeader(
-                            group.category,
-                            count: group.values.count,
-                            containsSelection: group.values.contains { $0.id == project.selectedTabID }
-                        )
-                        if !collapsedCategories.contains(group.category) {
-                            ForEach(group.values) { tab in
-                                tabItem(tab)
+                        let isCollapsed = collapsedCategories.contains(group.category)
+                        HStack(spacing: 1) {
+                            categoryHeader(
+                                group.category,
+                                count: group.values.count,
+                                containsSelection: group.values.contains { $0.id == project.selectedTabID }
+                            )
+                            if !isCollapsed {
+                                ForEach(group.values) { tab in
+                                    tabItem(tab)
+                                }
+                            }
+                        }
+                        .padding(isCollapsed ? 0 : 2)
+                        .background {
+                            if !isCollapsed {
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill(Color.primary.opacity(0.035))
                             }
                         }
                     }
@@ -337,7 +347,11 @@ private struct SessionTabsView: View {
             .foregroundStyle(.secondary)
             .padding(.horizontal, 7)
             .padding(.vertical, 5)
-            .contentShape(RoundedRectangle(cornerRadius: 6))
+            .contentShape(RoundedRectangle(cornerRadius: 5))
+            .background {
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(Color.primary.opacity(isCollapsed ? 0.07 : 0.09))
+            }
         }
         .buttonStyle(.plain)
         .id(category)

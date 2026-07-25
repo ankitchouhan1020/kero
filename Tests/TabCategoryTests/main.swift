@@ -20,6 +20,8 @@ let tabs: [(id: Int, category: TabCategory)] = [
 let groups = TabCategory.groups(tabs, by: \.category)
 assert(groups.map(\.category) == [.agents, .files, .terminals])
 assert(groups.map { $0.values.map(\.id) } == [[2], [1, 3], [4]])
+assert(groups.flatMap { group in group.values.map { _ in group.category } }
+    == [.agents, .files, .files, .terminals]) // Every parent's children form one adjacent run.
 
 var reordered = tabs
 TabCategory.reorder(
