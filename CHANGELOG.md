@@ -12,6 +12,8 @@ set in the Xcode project.
 
 ## [unrelease]
 
+## [0.1.28]
+
 - Group tabs into calm, connected Agents, Files, Commands, and Terminals sections that collapse without disrupting tab navigation or reordering
 - Enable the bundled `sora` CLI and MCP server by default; local automation can still be switched off in Settings
 - Refresh the Sora website with local automation details and deploy it to the maintainer-owned Cloudflare Worker

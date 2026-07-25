@@ -385,10 +385,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.27;
+				MARKETING_VERSION = 0.1.28;
 				OTHER_CODE_SIGN_FLAGS = "--identifier $(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev.helper;
 				PRODUCT_NAME = sora;
@@ -401,10 +401,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.27;
+				MARKETING_VERSION = 0.1.28;
 				OTHER_CODE_SIGN_FLAGS = "--identifier $(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.helper;
 				PRODUCT_NAME = sora;
@@ -421,7 +421,7 @@
 				CODE_SIGN_ENTITLEMENTS = kero/kero.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -432,7 +432,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.27;
+				MARKETING_VERSION = 0.1.28;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev;
 				PRODUCT_NAME = "Sora Debug";
 				REGISTER_APP_GROUPS = YES;
@@ -453,7 +453,7 @@
 				CODE_SIGN_ENTITLEMENTS = kero/kero.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -464,7 +464,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.27;
+				MARKETING_VERSION = 0.1.28;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora;
 				PRODUCT_NAME = Sora;
 				REGISTER_APP_GROUPS = YES;
