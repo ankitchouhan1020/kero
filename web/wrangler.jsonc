@@ -10,7 +10,5 @@
     "enabled": true
   },
   "workers_dev": true,
-
-  // Add after the kero.sh zone is moved to this Cloudflare account:
-  // "routes": [{ "pattern": "kero.sh", "custom_domain": true }]
+  "routes": [{ "pattern": "sora.ankitchouhan.dev", "custom_domain": true }]
 }

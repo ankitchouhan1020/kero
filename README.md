@@ -2,7 +2,7 @@
 
 A native terminal workspace for macOS.
 
-![preview](https://kero.sh/kero-screenshot.png)
+![preview](https://sora.ankitchouhan.dev/sora-screenshot.png)
 
 ## Features
 
@@ -15,7 +15,7 @@ A native terminal workspace for macOS.
 
 ## Download
 
-https://kero.sh
+https://sora.ankitchouhan.dev
 
 Or with Homebrew:
 

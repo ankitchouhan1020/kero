@@ -30,9 +30,8 @@ bun run deploy        # vite build → wrangler deploy
 picks it up. `bun run preview` serves the built Worker locally.
 
 Config lives in [`wrangler.jsonc`](wrangler.jsonc). Deployments use the
-maintainer-owned Cloudflare account selected by Wrangler and publish to the
-Worker's `workers.dev` address. The `kero.sh` custom-domain route is ready to
-enable after that zone is moved from its current Cloudflare account. Run
+maintainer-owned Cloudflare account selected by Wrangler and publish to both
+`sora.ankitchouhan.dev` and the Worker's `workers.dev` address. Run
 `bun run cf-typegen` after adding any bindings.
 
 ## Notes
@@ -48,8 +47,7 @@ enable after that zone is moved from its current Cloudflare account. Run
 
 ## Cutover and rollback
 
-Verify the `workers.dev` deployment, download link, and Homebrew command first.
-After the `kero.sh` zone is available in the same account, uncomment its custom
-domain route in `wrangler.jsonc`, deploy, verify HTTPS and DNS, then remove the
-old host. Wrangler keeps deployment history; rollback with
-`bunx wrangler rollback` from this directory.
+Verify the `workers.dev` deployment, download link, and Homebrew command first,
+then check `sora.ankitchouhan.dev` over HTTPS. The former `kero.sh` host can be
+retired or redirected after that check. Wrangler keeps deployment history;
+rollback with `bunx wrangler rollback` from this directory.
