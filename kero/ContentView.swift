@@ -224,6 +224,7 @@ private struct SessionTabsView: View {
     @State private var overflow = StripOverflow()
     @State private var draggedTabID: UUID?
     @State private var tabFrames: [UUID: CGRect] = [:]
+    @State private var collapsedCategories: Set<TabCategory> = []
     /// Tab currently showing the inline rename field, if any.
     @State private var renamingTabID: UUID?
 
@@ -238,34 +239,13 @@ private struct SessionTabsView: View {
             ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 3) {
-                    ForEach(project.tabs) { tab in
-                        PaneTabItem(
-                            tab: tab,
-                            isSelected: tab.id == project.selectedTabID,
-                            select: { project.selectedTabID = tab.id },
-                            close: { project.close(tab) },
-                            renamingTabID: $renamingTabID
-                        )
-                        .contextMenu { tabContextMenu(for: tab) }
-                        .background {
-                            GeometryReader { proxy in
-                                Color.clear.preference(
-                                    key: TabFramePreferenceKey.self,
-                                    value: [tab.id: proxy.frame(in: .global)]
-                                )
+                    ForEach(TabCategory.groups(project.tabs, by: \.category), id: \.category) { group in
+                        categoryHeader(group.category, count: group.values.count)
+                        if !collapsedCategories.contains(group.category) {
+                            ForEach(group.values) { tab in
+                                tabItem(tab)
                             }
                         }
-                        .opacity(draggedTabID == tab.id ? 0.65 : 1)
-                        // Masked to .subviews while renaming so dragging in the
-                        // text field selects text instead of reordering the tab.
-                        .highPriorityGesture(
-                            DragGesture(minimumDistance: 4, coordinateSpace: .global)
-                                .onChanged { value in
-                                    updateTabDrag(source: tab.id, location: value.location)
-                                }
-                                .onEnded { _ in endTabDrag() },
-                            including: renamingTabID == tab.id ? .subviews : .all
-                        )
                     }
                 }
             }
@@ -323,6 +303,62 @@ private struct SessionTabsView: View {
             .tooltip("New Session (⌘T)", edge: .below)
         }
         .onPreferenceChange(TabFramePreferenceKey.self) { tabFrames = $0 }
+    }
+
+    private func categoryHeader(_ category: TabCategory, count: Int) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                if !collapsedCategories.insert(category).inserted {
+                    collapsedCategories.remove(category)
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: category.systemImage)
+                Text(category.rawValue)
+                Text("\(count)")
+                    .monospacedDigit()
+                    .foregroundStyle(.tertiary)
+                Image(systemName: collapsedCategories.contains(category) ? "chevron.right" : "chevron.down")
+                    .font(.system(size: 7, weight: .bold))
+            }
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 5)
+            .contentShape(RoundedRectangle(cornerRadius: 6))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func tabItem(_ tab: PaneTab) -> some View {
+        PaneTabItem(
+            tab: tab,
+            isSelected: tab.id == project.selectedTabID,
+            select: { project.selectedTabID = tab.id },
+            close: { project.close(tab) },
+            renamingTabID: $renamingTabID
+        )
+        .contextMenu { tabContextMenu(for: tab) }
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(
+                    key: TabFramePreferenceKey.self,
+                    value: [tab.id: proxy.frame(in: .global)]
+                )
+            }
+        }
+        .opacity(draggedTabID == tab.id ? 0.65 : 1)
+        // Masked to .subviews while renaming so dragging in the text field
+        // selects text instead of reordering the tab.
+        .highPriorityGesture(
+            DragGesture(minimumDistance: 4, coordinateSpace: .global)
+                .onChanged { value in
+                    updateTabDrag(source: tab.id, location: value.location)
+                }
+                .onEnded { _ in endTabDrag() },
+            including: renamingTabID == tab.id ? .subviews : .all
+        )
     }
 
     /// Reorders immediately as the pointer crosses another tab. This direct
