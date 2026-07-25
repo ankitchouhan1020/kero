@@ -11,7 +11,7 @@
 // The private signing key is read from your login keychain (see RELEASING.md).
 // Env overrides:
 //   SPARKLE_BIN          dir containing the Sparkle tools (generate_appcast)
-//   DOWNLOAD_URL_PREFIX  base URL for <enclosure> links (default releases.kero.sh)
+//   DOWNLOAD_URL_PREFIX  base URL for <enclosure> links (default releases.ankitchouhan.dev)
 import { $ } from "bun";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
@@ -66,6 +66,6 @@ export async function generateAppcast(
 if (import.meta.main) {
   const updatesDir = process.argv[2];
   if (!updatesDir) die("usage: bun scripts/generate-appcast.ts <updates-dir>");
-  const prefix = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.kero.sh/";
+  const prefix = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.ankitchouhan.dev/";
   await generateAppcast(updatesDir, prefix);
 }

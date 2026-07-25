@@ -10,7 +10,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Add a new
 `## [<version>]` section at the top for each release, matching the version you
 set in the Xcode project.
 
-## [unrelease]
+## [0.1.26]
 
 - The Processes list no longer shows `<defunct>` entries: those are exited children waiting to be reaped, not something you can see output from or kill
 - Opening a large diff no longer freezes the window: diffs render only the rows on screen and highlight them off the main thread

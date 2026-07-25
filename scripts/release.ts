@@ -4,7 +4,7 @@
 //   archive → Developer ID export → notarize → staple → package →
 //   sign & (re)generate the Sparkle appcast → upload to Cloudflare R2.
 //
-// Download origin: https://releases.kero.sh  (R2 bucket + custom domain).
+// Download origin: https://releases.ankitchouhan.dev  (R2 bucket + custom domain).
 //
 // One-time setup (see RELEASING.md):
 //   • Sparkle EdDSA keys in your keychain   — `generate_keys`
@@ -53,7 +53,7 @@ const NOTARY_PROFILE = process.env.NOTARY_PROFILE ?? "NOTARY";
 // Codesigning identity for the .dmg itself. A partial name matches when there's
 // a single Developer ID Application cert; override with the full name/SHA-1.
 const SIGN_IDENTITY = process.env.SIGN_IDENTITY ?? "Developer ID Application";
-const DOWNLOAD_URL_PREFIX = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.kero.sh/";
+const DOWNLOAD_URL_PREFIX = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.ankitchouhan.dev/";
 const R2_REMOTE = process.env.R2_REMOTE ?? "r2";
 const R2_BUCKET = process.env.R2_BUCKET ?? "kero-releases";
 const R2_DEST = `${R2_REMOTE}:${R2_BUCKET}`;
@@ -69,8 +69,7 @@ if (!Number.isSafeInteger(HISTORY_COUNT) || HISTORY_COUNT < 0) {
 // bucket already exists, so skip that on every call.
 const RCLONE_FLAGS = ["--s3-no-check-bucket"];
 
-process.env.DEVELOPER_DIR ??= "/Applications/Xcode-beta.app/Contents/Developer";
-
+// Respect xcode-select unless the caller explicitly sets DEVELOPER_DIR.
 need("xcodebuild");
 need("ditto");
 if (!localBuild) need("xcrun");

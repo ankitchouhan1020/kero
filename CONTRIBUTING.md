@@ -7,7 +7,7 @@ that out before the work.
 ## Setup and build
 
 ```bash
-git clone --recurse-submodules https://github.com/egoist/kero.git
+git clone --recurse-submodules https://github.com/ankitchouhan1020/kero.git
 ```
 
 Already cloned? `git submodule update --init --recursive`. Bun is also needed for

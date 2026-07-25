@@ -11,13 +11,13 @@ export const Route = createFileRoute('/')({
 
 type Release = { version: string; minSystem: string; dmg: string }
 
-const RELEASES_ORIGIN = 'https://releases.kero.sh'
+const RELEASES_ORIGIN = 'https://releases.ankitchouhan.dev'
 const APPCAST_URL = `${RELEASES_ORIGIN}/appcast.xml`
 const X_URL = 'https://x.com/localhost_4173'
-const GITHUB_URL = 'https://github.com/egoist/kero'
-// Cask lives in egoist/homebrew-tap, so the tap has to be named explicitly.
+const GITHUB_URL = 'https://github.com/ankitchouhan1020/kero'
+// Cask lives in ankitchouhan1020/homebrew-tap, so the tap has to be named explicitly.
 // `--cask` is optional — brew falls back to casks, and the tap has no `kero` formula.
-const BREW_COMMAND = 'brew install egoist/tap/kero'
+const BREW_COMMAND = 'brew install ankitchouhan1020/tap/kero'
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
@@ -197,7 +197,7 @@ const FAQ: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'Does it collect any data?',
-    a: 'No telemetry, no analytics. The only network call kero makes is the update check against releases.kero.sh.',
+    a: 'No telemetry, no analytics. The only network call kero makes is the update check against releases.ankitchouhan.dev.',
   },
   {
     q: 'What happens to my sessions when I quit?',

@@ -8,7 +8,7 @@ through the in-app updater and https://kero.sh.
 ## Reporting a Vulnerability
 
 Please use GitHub private vulnerability reporting:
-https://github.com/egoist/kero/security/advisories/new
+https://github.com/ankitchouhan1020/kero/security/advisories/new
 
 If that doesn't work for you, email hi@egoist.dev.
 

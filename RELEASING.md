@@ -1,9 +1,9 @@
 # Releasing kero
 
 kero auto-updates with [Sparkle](https://sparkle-project.org). Releases live in a
-**Cloudflare R2** bucket served at **`https://releases.kero.sh`**. New users
+**Cloudflare R2** bucket served at **`https://releases.ankitchouhan.dev`**. New users
 download a notarized **`.dmg`**; existing users get smaller in-app delta updates
-via Sparkle, which reads the appcast at `https://releases.kero.sh/appcast.xml`,
+via Sparkle, which reads the appcast at `https://releases.ankitchouhan.dev/appcast.xml`,
 verifies each build's EdDSA signature, and installs it. One release command
 produces both.
 
@@ -79,9 +79,9 @@ project).
 
 1. Create an R2 bucket (default name the script expects: `kero-releases` — or set
    `R2_BUCKET`).
-2. Attach the custom domain **`releases.kero.sh`** to the bucket
+2. Attach the custom domain **`releases.ankitchouhan.dev`** to the bucket
    (R2 → your bucket → Settings → Custom Domains). This serves objects publicly
-   at `https://releases.kero.sh/<file>`.
+   at `https://releases.ankitchouhan.dev/<file>`.
 3. Create an **R2 API token** (R2 → Manage API Tokens → Object Read & Write).
    It only needs access to this one bucket — the script passes
    `--s3-no-check-bucket`, so no bucket-creation permission is required.
@@ -132,7 +132,7 @@ most recent archives from R2 by default (so Sparkle can build deltas) →
 regenerates `appcast.xml` → uploads the DMG and the update archives to R2. When
 it finishes:
 
-- **Download link** (for the website): `https://releases.kero.sh/kero-<version>.dmg`
+- **Download link** (for the website): `https://releases.ankitchouhan.dev/kero-<version>.dmg`
 - **In-app updates**: served from the same origin via the appcast.
 
 Notarizing the DMG also notarizes the app's code, so the script staples both from
@@ -151,9 +151,9 @@ Test by running an **older** build and choosing **Check for Updates…**.
 | `NOTARY_PROFILE` | `NOTARY` | `notarytool` keychain profile |
 | `SIGN_IDENTITY` | `Developer ID Application` | codesigning identity for the DMG |
 | `EXPORT_OPTIONS` | `scripts/ExportOptions.plist` | export config |
-| `DOWNLOAD_URL_PREFIX` | `https://releases.kero.sh/` | base URL in the appcast |
+| `DOWNLOAD_URL_PREFIX` | `https://releases.ankitchouhan.dev/` | base URL in the appcast |
 | `HISTORY_COUNT` | `15` | number of recent archives to pull for delta generation |
-| `TAP_REPO` | `egoist/homebrew-tap` | tap holding the Homebrew cask |
+| `TAP_REPO` | `ankitchouhan1020/homebrew-tap` | tap holding the Homebrew cask |
 | `TAP_CASK` | `Casks/kero.rb` | cask path within the tap |
 | `TAP_DIR` | `build/homebrew-tap` | local checkout of the tap |
 | `FORCE=1` | — | re-release a version that already exists |
@@ -164,8 +164,8 @@ Test by running an **older** build and choosing **Check for Updates…**.
 
 ## The Homebrew cask
 
-kero is also installable with `brew install egoist/tap/kero`, from the
-cask at [`egoist/homebrew-tap`](https://github.com/egoist/homebrew-tap)
+kero is also installable with `brew install ankitchouhan1020/tap/kero`, from the
+cask at [`ankitchouhan1020/homebrew-tap`](https://github.com/ankitchouhan1020/homebrew-tap)
 (`Casks/kero.rb`). The cask downloads the same `.dmg` from R2, so it needs the
 new version and its `sha256` after every release.
 
@@ -197,7 +197,7 @@ deployment target, edit that stanza in the tap by hand.
 - **Two artifacts per release:** a notarized `.dmg` (what people download) and a
   `.zip` (what Sparkle installs, with binary deltas). Only the `.zip` goes in the
   appcast; point your website's download button at
-  `https://releases.kero.sh/kero-<version>.dmg`. Want a stable URL? Add a
+  `https://releases.ankitchouhan.dev/kero-<version>.dmg`. Want a stable URL? Add a
   Cloudflare redirect from e.g. `/download` to the newest `.dmg`.
 - **Automatic checks:** by default Sparkle asks the user once whether to allow
   automatic update checks. To opt in by default (no prompt), add to

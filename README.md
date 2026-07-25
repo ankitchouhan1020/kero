@@ -20,7 +20,7 @@ https://kero.sh
 Or with Homebrew:
 
 ```sh
-brew install egoist/tap/kero
+brew install ankitchouhan1020/tap/kero
 ```
 
 ## Contributing

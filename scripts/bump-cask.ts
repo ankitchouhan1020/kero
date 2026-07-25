@@ -2,7 +2,7 @@
 //
 // Bump the Homebrew cask in the tap to a released version.
 //
-// The cask (https://github.com/egoist/homebrew-tap, Casks/kero.rb) points at the
+// The cask (https://github.com/ankitchouhan1020/homebrew-tap, Casks/kero.rb) points at the
 // DMG in R2, so it needs the new version + its sha256 after every release.
 // `scripts/release.ts` calls this at the end; it's also runnable on its own to
 // retry a failed push or to backfill a version released before this existed:
@@ -13,7 +13,7 @@
 //
 // Env (NO_TAP=1 skips the bump, but that's release.ts's flag — running this
 // script directly is already an explicit request to bump):
-//   TAP_REPO     default egoist/homebrew-tap
+//   TAP_REPO     default ankitchouhan1020/homebrew-tap
 //   TAP_CASK     path of the cask within the tap, default Casks/kero.rb
 //   TAP_DIR      local checkout, default build/homebrew-tap
 import { $ } from "bun";
@@ -21,10 +21,10 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { die, say } from "./lib";
 
-const TAP_REPO = process.env.TAP_REPO ?? "egoist/homebrew-tap";
+const TAP_REPO = process.env.TAP_REPO ?? "ankitchouhan1020/homebrew-tap";
 const TAP_CASK = process.env.TAP_CASK ?? "Casks/kero.rb";
 const TAP_DIR = process.env.TAP_DIR ?? join(process.env.BUILD_DIR ?? "build", "homebrew-tap");
-const DOWNLOAD_URL_PREFIX = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.kero.sh/";
+const DOWNLOAD_URL_PREFIX = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.ankitchouhan.dev/";
 
 /** macOS versions Homebrew knows by name, for the `depends_on macos:` check. */
 const MACOS_NAMES: Record<string, string> = {
