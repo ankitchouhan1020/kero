@@ -18,9 +18,16 @@ const GITHUB_URL = 'https://github.com/ankitchouhan1020/sora'
 // Cask lives in ankitchouhan1020/homebrew-tap, so the tap has to be named explicitly.
 // `--cask` is optional — brew falls back to casks, and the tap has no `sora` formula.
 const BREW_COMMAND = 'brew install ankitchouhan1020/tap/sora'
-const MCP_COMMAND = '/opt/homebrew/bin/sora mcp'
+const MCP_CONFIG = `{
+  "mcpServers": {
+    "sora": {
+      "command": "/opt/homebrew/bin/sora",
+      "args": ["mcp"]
+    }
+  }
+}`
 const AGENT_PROMPT =
-  'Configure Sora for this agent. If MCP is supported, add a stdio server with command /opt/homebrew/bin/sora and argument mcp. Otherwise, including in Pi, use the sora CLI directly. Verify the connection with sora status.'
+  'Configure Sora for this project. Create .mcp.json with an MCP server named sora, command /opt/homebrew/bin/sora, and args ["mcp"]. If MCP is unsupported, including in Pi, use the sora CLI directly. Verify with sora status.'
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
@@ -332,9 +339,10 @@ function Home() {
       <section className="flex flex-col gap-3.5">
         <SectionHeading>Connect an AI agent</SectionHeading>
         <p className="text-muted-foreground">
-          MCP-capable clients launch Sora over stdio. Pi can use the same bundled CLI directly.
+          Save this as <code>.mcp.json</code>. Your MCP client launches the silent stdio server;
+          Pi uses the bundled CLI directly.
         </p>
-        <CopyCommand command={MCP_COMMAND} />
+        <CopyCommand command={MCP_CONFIG} wrap />
         <p className="text-[13px] text-muted-foreground">Or give your agent this:</p>
         <CopyCommand command={AGENT_PROMPT} wrap />
       </section>
