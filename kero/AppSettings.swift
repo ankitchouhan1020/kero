@@ -7,23 +7,23 @@ import AppKit
 import Combine
 import Foundation
 
-/// User-configurable settings, persisted to `$HOME/.config/kero/config.toml`.
+/// User-configurable settings, persisted to `$HOME/.config/sora/config.toml`.
 /// Views observe this directly; `TerminalManager` re-themes live sessions on
 /// any change.
 @MainActor
 final class AppSettings: nonisolated ObservableObject {
     static let shared = AppSettings()
 
-    /// Development (Debug) builds store their config under `~/.config/kero-dev`
-    /// instead of `~/.config/kero`, so running a dev build alongside an
+    /// Development (Debug) builds store their config under `~/.config/sora-dev`
+    /// instead of `~/.config/sora`, so running a dev build alongside an
     /// installed production build doesn't clobber its settings. This mirrors
-    /// the separate `sh.kero.dev` bundle identifier that keeps the two apps'
+    /// the separate debug bundle identifier that keeps the two apps'
     /// `UserDefaults` (session snapshot, sidebar widths, Sparkle) apart.
     static let configURL: URL = {
         #if DEBUG
-        let directory = "kero-dev"
+        let directory = "sora-dev"
         #else
-        let directory = "kero"
+        let directory = "sora"
         #endif
         return FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent(".config/\(directory)/config.toml")

@@ -1,7 +1,7 @@
-# Contributing to Kero
+# Contributing to Sora
 
 For anything larger than a fix, open an issue first —
-Kero says no to features that fit some other tool better, and it's kinder to find
+Sora says no to features that fit some other tool better, and it's kinder to find
 that out before the work.
 
 ## Setup and build

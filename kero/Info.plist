@@ -4,11 +4,9 @@
 <dict>
 	<!-- This Info.plist is authored by hand (GENERATE_INFOPLIST_FILE = NO) so we
 	     own the Bundle* keys instead of letting the generator derive them.
-	     PRODUCT_NAME is pinned per configuration (Kero for Release, Kero Debug
-	     for Debug) rather than derived from the lowercase target name. The
-	     release bundle id stays sh.kero — it's the app's identity for Sparkle
-	     and code signing, so it must not change. Dynamic values use build-setting
-	     substitution to stay in sync. -->
+	     PRODUCT_NAME is pinned per configuration (Sora for Release, Sora Debug
+	     for Debug) rather than derived from the lowercase target name. Dynamic
+	     values use build-setting substitution to stay in sync. -->
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
@@ -61,9 +59,9 @@
 	</array>
 
 	<!-- Programs running inside the terminal (e.g. Claude Code voice dictation)
-	     request mic access attributed to Kero as the responsible process. -->
+	     request mic access attributed to Sora as the responsible process. -->
 	<key>NSMicrophoneUsageDescription</key>
-	<string>A program running within Kero would like to use your microphone.</string>
+	<string>A program running within Sora would like to use your microphone.</string>
 
 	<!-- Sparkle auto-update configuration.
 	     Appcast feed hosted on Cloudflare R2 (releases.ankitchouhan.dev); see RELEASING.md. -->

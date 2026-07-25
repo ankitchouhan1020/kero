@@ -16,20 +16,20 @@ const APPCAST_URL = `${RELEASES_ORIGIN}/appcast.xml`
 const X_URL = 'https://x.com/localhost_4173'
 const GITHUB_URL = 'https://github.com/ankitchouhan1020/kero'
 // Cask lives in ankitchouhan1020/homebrew-tap, so the tap has to be named explicitly.
-// `--cask` is optional — brew falls back to casks, and the tap has no `kero` formula.
-const BREW_COMMAND = 'brew install ankitchouhan1020/tap/kero'
+// `--cask` is optional — brew falls back to casks, and the tap has no `sora` formula.
+const BREW_COMMAND = 'brew install ankitchouhan1020/tap/sora'
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
   version: '0.1.11',
   minSystem: '15.6',
-  dmg: `${RELEASES_ORIGIN}/kero-0.1.11.dmg`,
+  dmg: `${RELEASES_ORIGIN}/sora-0.1.11.dmg`,
 }
 
 /**
  * Pick the newest release out of the Sparkle appcast — the item with the highest
  * build number (`sparkle:version`). The site links the notarized `.dmg`, which
- * sits beside the `.zip` update enclosure at `kero-<version>.dmg`.
+ * sits beside the `.zip` update enclosure at `sora-<version>.dmg`.
  */
 function parseLatestRelease(xml: string): Release | null {
   let best: { build: number; version: string; minSystem: string } | null = null
@@ -52,7 +52,7 @@ function parseLatestRelease(xml: string): Release | null {
   return {
     version: best.version,
     minSystem: best.minSystem,
-    dmg: `${RELEASES_ORIGIN}/kero-${best.version}.dmg`,
+    dmg: `${RELEASES_ORIGIN}/sora-${best.version}.dmg`,
   }
 }
 
@@ -143,7 +143,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       },
       {
         name: 'Built on libghostty',
-        detail: "Ghostty's terminal core, embedded and hosted natively by kero",
+        detail: "Ghostty's terminal core, embedded and hosted natively by Sora",
       },
       {
         name: 'Desktop notifications',
@@ -188,16 +188,16 @@ const SHORTCUTS: Row[] = [
 
 const FAQ: { q: string; a: ReactNode }[] = [
   {
-    q: 'Is kero free?',
+    q: 'Is Sora free?',
     a: 'Yes. Free to download, no subscription, no account.',
   },
   {
     q: 'Does it replace my shell?',
-    a: 'No. kero hosts the shell you already run and leaves your prompt, aliases, and dotfiles untouched. The terminal underneath is libghostty, the same core as Ghostty.',
+    a: 'No. Sora hosts the shell you already run and leaves your prompt, aliases, and dotfiles untouched. The terminal underneath is libghostty, the same core as Ghostty.',
   },
   {
     q: 'Does it collect any data?',
-    a: 'No telemetry, no analytics. The only network call kero makes is the update check against releases.ankitchouhan.dev.',
+    a: 'No telemetry, no analytics. The only network call Sora makes is the update check against releases.ankitchouhan.dev.',
   },
   {
     q: 'What happens to my sessions when I quit?',
@@ -224,7 +224,7 @@ function Home() {
             height={100}
             className="block size-12 border border-zinc-600 rounded-md"
           />
-          kero
+          Sora
         </h1>
         <p className="text-foreground/70">
           Your terminal, with the <span className="text-brand">whole project</span> around it.
@@ -273,7 +273,7 @@ function Home() {
       <figure className="m-0 flex flex-col gap-2">
         <img
           src="/kero-screenshot.png"
-          alt="kero showing a project's terminal session with the git panel open"
+          alt="Sora showing a project's terminal session with the git panel open"
           width={2286}
           height={1568}
           className="block w-full rounded-lg border border-border bg-card"

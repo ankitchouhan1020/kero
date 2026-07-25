@@ -1,4 +1,4 @@
-# Kero
+# Sora
 
 A native terminal workspace for macOS.
 
@@ -20,7 +20,7 @@ https://kero.sh
 Or with Homebrew:
 
 ```sh
-brew install ankitchouhan1020/tap/kero
+brew install ankitchouhan1020/tap/sora
 ```
 
 ## Contributing

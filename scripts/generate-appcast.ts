@@ -5,7 +5,7 @@
 // Usage:
 //   bun scripts/generate-appcast.ts <updates-dir>
 //
-// <updates-dir> holds the packaged archives (e.g. kero-1.1.zip) plus any older
+// <updates-dir> holds the packaged archives (e.g. sora-1.1.zip) plus any older
 // archives so Sparkle can build deltas. appcast.xml is written into that dir.
 //
 // The private signing key is read from your login keychain (see RELEASING.md).
@@ -56,7 +56,7 @@ export async function generateAppcast(
     );
   }
   console.log(`Using: ${gen}`);
-  // Same prefix for both: archives and the kero-<version>.md release notes are
+  // Same prefix for both: archives and the sora-<version>.md release notes are
   // served from the same origin. The notes prefix makes generate_appcast emit
   // <sparkle:releaseNotesLink> for any notes file matching an archive name.
   await $`${gen} --download-url-prefix ${downloadUrlPrefix} --release-notes-url-prefix ${downloadUrlPrefix} ${updatesDir}`;

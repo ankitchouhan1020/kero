@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 //
-// Automated kero release:
+// Automated Sora release:
 //   archive → Developer ID export → notarize → staple → package →
 //   sign & (re)generate the Sparkle appcast → upload to Cloudflare R2.
 //
@@ -55,7 +55,7 @@ const NOTARY_PROFILE = process.env.NOTARY_PROFILE ?? "NOTARY";
 const SIGN_IDENTITY = process.env.SIGN_IDENTITY ?? "Developer ID Application";
 const DOWNLOAD_URL_PREFIX = process.env.DOWNLOAD_URL_PREFIX ?? "https://releases.ankitchouhan.dev/";
 const R2_REMOTE = process.env.R2_REMOTE ?? "r2";
-const R2_BUCKET = process.env.R2_BUCKET ?? "kero-releases";
+const R2_BUCKET = process.env.R2_BUCKET ?? "kero-releases"; // existing bucket; public app name is Sora
 const R2_DEST = `${R2_REMOTE}:${R2_BUCKET}`;
 // Keep a broader recent window available for delta generation. Override to
 // trade delta coverage for less download/storage.
@@ -93,7 +93,7 @@ await $`xcodebuild -project ${PROJECT} -scheme ${SCHEME} -configuration ${CONFIG
 say("Exporting Developer ID app…");
 await $`xcodebuild -exportArchive -archivePath ${ARCHIVE_PATH} -exportOptionsPlist ${EXPORT_OPTIONS} -exportPath ${EXPORT_DIR}`;
 
-const app = join(EXPORT_DIR, "Kero.app");
+const app = join(EXPORT_DIR, "Sora.app");
 if (!existsSync(app)) die(`exported app not found at ${app}`);
 const appPlist = join(app, "Contents/Info.plist");
 
@@ -101,9 +101,9 @@ const appPlist = join(app, "Contents/Info.plist");
 const version = (await $`plutil -extract CFBundleShortVersionString raw ${appPlist}`.text()).trim();
 const build = (await $`plutil -extract CFBundleVersion raw ${appPlist}`.text()).trim();
 if (!version) die("could not read CFBundleShortVersionString");
-const zipName = `kero-${version}.zip`; // Sparkle in-app update (deltas)
-const dmgName = `kero-${version}.dmg`; // notarized download
-say(`Releasing kero ${version} (build ${build})`);
+const zipName = `sora-${version}.zip`; // Sparkle in-app update (deltas)
+const dmgName = `sora-${version}.dmg`; // notarized download
+say(`Releasing Sora ${version} (build ${build})`);
 
 // Don't clobber an already-published version unless forced.
 if (!localBuild && process.env.FORCE !== "1") {
@@ -127,22 +127,22 @@ const dmgStaging = join(BUILD_DIR, "dmg");
 rmSync(dmgStaging, { recursive: true, force: true });
 rmSync(dmgPath, { force: true });
 mkdirSync(dmgStaging, { recursive: true });
-await $`ditto ${app} ${join(dmgStaging, "Kero.app")}`;
+await $`ditto ${app} ${join(dmgStaging, "Sora.app")}`;
 // create-dmg can return non-zero from cosmetic Finder-scripting hiccups even
 // when the image is fine, so check for the file instead of the exit code.
 await $`create-dmg \
-  --volname ${`Kero ${version}`} \
+  --volname ${`Sora ${version}`} \
   --window-size 540 380 \
   --icon-size 128 \
-  --icon ${"Kero.app"} 150 195 \
+  --icon ${"Sora.app"} 150 195 \
   --app-drop-link 390 195 \
-  --hide-extension ${"Kero.app"} \
+  --hide-extension ${"Sora.app"} \
   --no-internet-enable \
   ${dmgPath} ${dmgStaging}`.nothrow();
 if (!existsSync(dmgPath)) die("create-dmg did not produce a disk image");
 await $`codesign --force --sign ${SIGN_IDENTITY} ${dmgPath}`;
 if (localBuild) {
-  say(`Done. Built and signed kero ${version} locally; nothing was notarized or published:`);
+  say(`Done. Built and signed Sora ${version} locally; nothing was notarized or published:`);
   console.log(`     app      : ${app}`);
   console.log(`     download : ${dmgPath}`);
   process.exit(0);
@@ -170,12 +170,12 @@ if (process.env.NO_HISTORY !== "1") {
     await $`rclone lsjson ${R2_DEST} ${RCLONE_FLAGS} --files-only --include ${"*.zip"} --include ${"appcast.xml"}`.text(),
   ) as RemoteFile[];
   const archiveVersion = (name: string) =>
-    name.slice("kero-".length, -".zip".length);
+    name.slice("sora-".length, -".zip".length);
   const versionOrder = new Intl.Collator("en", { numeric: true });
   const recentArchives = remoteFiles
     .filter(
       ({ Name, IsDir }) =>
-        !IsDir && /^kero-.+\.zip$/.test(Name) && Name !== zipName,
+        !IsDir && /^sora-.+\.zip$/.test(Name) && Name !== zipName,
     )
     .sort((a, b) =>
       versionOrder.compare(archiveVersion(b.Name), archiveVersion(a.Name)),
@@ -206,13 +206,13 @@ say(`Packaging ${zipName}…`);
 await $`ditto -c -k --keepParent ${app} ${join(UPDATES_DIR, zipName)}`;
 
 // Release notes: slice this version's section out of CHANGELOG.md next to the
-// archive (as kero-<version>.md). generate_appcast then attaches it as the
+// archive (as sora-<version>.md). generate_appcast then attaches it as the
 // update's <sparkle:releaseNotesLink>, which Sparkle renders in the prompt.
 const changelog = "CHANGELOG.md";
 if (existsSync(changelog)) {
   const notes = extractReleaseNotes(await Bun.file(changelog).text(), version);
   if (notes) {
-    await Bun.write(join(UPDATES_DIR, `kero-${version}.md`), `${notes}\n`);
+    await Bun.write(join(UPDATES_DIR, `sora-${version}.md`), `${notes}\n`);
     say(`Attached release notes for ${version}`);
   } else {
     say(`No "${version}" section in ${changelog} — releasing without notes`);
@@ -252,7 +252,7 @@ if (process.env.NO_TAP !== "1") {
   }
 }
 
-say(`Done. kero ${version} is live:`);
+say(`Done. Sora ${version} is live:`);
 console.log(`     download : ${DOWNLOAD_URL_PREFIX}${dmgName}`);
 console.log(`     update   : ${DOWNLOAD_URL_PREFIX}${zipName}`);
 console.log(`     feed     : ${DOWNLOAD_URL_PREFIX}appcast.xml`);

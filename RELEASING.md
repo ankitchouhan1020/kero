@@ -1,6 +1,6 @@
-# Releasing kero
+# Releasing Sora
 
-kero auto-updates with [Sparkle](https://sparkle-project.org). Releases live in a
+Sora auto-updates with [Sparkle](https://sparkle-project.org). Releases live in a
 **Cloudflare R2** bucket served at **`https://releases.ankitchouhan.dev`**. New users
 download a notarized **`.dmg`**; existing users get smaller in-app delta updates
 via Sparkle, which reads the appcast at `https://releases.ankitchouhan.dev/appcast.xml`,
@@ -132,7 +132,7 @@ most recent archives from R2 by default (so Sparkle can build deltas) →
 regenerates `appcast.xml` → uploads the DMG and the update archives to R2. When
 it finishes:
 
-- **Download link** (for the website): `https://releases.ankitchouhan.dev/kero-<version>.dmg`
+- **Download link** (for the website): `https://releases.ankitchouhan.dev/sora-<version>.dmg`
 - **In-app updates**: served from the same origin via the appcast.
 
 Notarizing the DMG also notarizes the app's code, so the script staples both from
@@ -154,7 +154,7 @@ Test by running an **older** build and choosing **Check for Updates…**.
 | `DOWNLOAD_URL_PREFIX` | `https://releases.ankitchouhan.dev/` | base URL in the appcast |
 | `HISTORY_COUNT` | `15` | number of recent archives to pull for delta generation |
 | `TAP_REPO` | `ankitchouhan1020/homebrew-tap` | tap holding the Homebrew cask |
-| `TAP_CASK` | `Casks/kero.rb` | cask path within the tap |
+| `TAP_CASK` | `Casks/sora.rb` | cask path within the tap |
 | `TAP_DIR` | `build/homebrew-tap` | local checkout of the tap |
 | `FORCE=1` | — | re-release a version that already exists |
 | `NO_TAP=1` | — | skip bumping the Homebrew cask |
@@ -164,15 +164,15 @@ Test by running an **older** build and choosing **Check for Updates…**.
 
 ## The Homebrew cask
 
-kero is also installable with `brew install ankitchouhan1020/tap/kero`, from the
+Sora is also installable with `brew install ankitchouhan1020/tap/sora`, from the
 cask at [`ankitchouhan1020/homebrew-tap`](https://github.com/ankitchouhan1020/homebrew-tap)
-(`Casks/kero.rb`). The cask downloads the same `.dmg` from R2, so it needs the
+(`Casks/sora.rb`). The cask downloads the same `.dmg` from R2, so it needs the
 new version and its `sha256` after every release.
 
 `scripts/release.ts` does that for you as its last step
 ([`scripts/bump-cask.ts`](scripts/bump-cask.ts)): it hashes the DMG it just
 built, clones/refreshes the tap under `build/homebrew-tap`, rewrites the
-`version` and `sha256` stanzas, and pushes a `kero <version>` commit. It needs
+`version` and `sha256` stanzas, and pushes a `sora <version>` commit. It needs
 **push access to the tap over SSH** — nothing else.
 
 The bump runs *after* the upload, so the hash always covers a DMG that's already
@@ -197,7 +197,7 @@ deployment target, edit that stanza in the tap by hand.
 - **Two artifacts per release:** a notarized `.dmg` (what people download) and a
   `.zip` (what Sparkle installs, with binary deltas). Only the `.zip` goes in the
   appcast; point your website's download button at
-  `https://releases.ankitchouhan.dev/kero-<version>.dmg`. Want a stable URL? Add a
+  `https://releases.ankitchouhan.dev/sora-<version>.dmg`. Want a stable URL? Add a
   Cloudflare redirect from e.g. `/download` to the newest `.dmg`.
 - **Automatic checks:** by default Sparkle asks the user once whether to allow
   automatic update checks. To opt in by default (no prompt), add to
@@ -208,13 +208,13 @@ deployment target, edit that stanza in the tap by hand.
   ```
   The **Updates** settings toggle lets users change it either way.
 - **Release notes** live in [`CHANGELOG.md`](CHANGELOG.md). The release script
-  publishes the matching version section as `kero-<version>.md` next to the
+  publishes the matching version section as `sora-<version>.md` next to the
   archive, and `generate_appcast` links it as the update's release notes
   (Sparkle 2.9+ renders Markdown). No matching section → the release just ships
   without notes. Notes for older versions stay in R2, so they keep showing.
 - Until the real `SUPublicEDKey` is in place, the app runs and checks the feed
   fine, but installing an update fails signature verification by design.
-- kero isn't sandboxed, so no Sparkle XPC services need bundling.
+- Sora isn't sandboxed, so no Sparkle XPC services need bundling.
 - Old archives stay in R2 so users far behind can still download them. Only the
   recent archives needed for new deltas are staged under `build/`, which is
   git-ignored.

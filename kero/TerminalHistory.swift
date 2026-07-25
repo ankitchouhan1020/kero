@@ -403,14 +403,14 @@ enum TerminalHistorySerializer {
 /// Each save rewrites the whole file from the live set of sessions, so keys
 /// belonging to sessions that no longer exist are pruned automatically.
 enum TerminalHistoryStore {
-    /// Debug builds keep their state under `kero-dev`, matching `AppSettings`
-    /// and the separate `sh.kero.dev` bundle id, so a dev build never clobbers
+    /// Debug builds keep their state under `sora-dev`, matching `AppSettings`
+    /// and the separate debug bundle id, so a dev build never clobbers
     /// an installed production build's history.
     private static let fileURL: URL = {
         #if DEBUG
-        let directory = "kero-dev"
+        let directory = "sora-dev"
         #else
-        let directory = "kero"
+        let directory = "sora"
         #endif
         let base = FileManager.default.urls(
             for: .applicationSupportDirectory, in: .userDomainMask

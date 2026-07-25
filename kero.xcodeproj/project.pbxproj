@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FF3FDD73300B6A7400112486 /* Kero Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Kero Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF3FDD73300B6A7400112486 /* Sora Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sora Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -68,7 +68,7 @@
 		FF3FDD74300B6A7400112486 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FF3FDD73300B6A7400112486 /* Kero Debug.app */,
+				FF3FDD73300B6A7400112486 /* Sora Debug.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -100,7 +100,7 @@
 				AA30000000000000000000A1 /* TreeSitterTSX */,
 			);
 			productName = kero;
-			productReference = FF3FDD73300B6A7400112486 /* Kero Debug.app */;
+			productReference = FF3FDD73300B6A7400112486 /* Sora Debug.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -300,8 +300,8 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 0.1.26;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.kero.dev;
-				PRODUCT_NAME = "Kero Debug";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev;
+				PRODUCT_NAME = "Sora Debug";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -332,8 +332,8 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 0.1.26;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.kero;
-				PRODUCT_NAME = Kero;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora;
+				PRODUCT_NAME = Sora;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

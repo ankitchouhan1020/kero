@@ -31,7 +31,7 @@ set in the Xcode project.
 
 ## [0.1.22]
 
-- Add “Open in Kero” to Finder’s folder context menu, opening each selected folder as a project with its terminal started there
+- Add “Open in Sora” to Finder’s folder context menu, opening each selected folder as a project with its terminal started there
 - Full-screen programs with their own background color (vim, htop, TUIs) now fill the terminal pane: the padding around the grid takes on the adjacent content's background instead of always showing the theme background, leaving only a hairline frame at the pane edges
 - Fix non-ASCII rendering in git diff view
 - Allow to rename session tabs
@@ -45,7 +45,7 @@ set in the Xcode project.
 
 ## [0.1.20]
 
-- Security: stop terminal programs from silently reading your clipboard — an OSC 52 escape sequence (for example from a remote SSH host) could previously read the macOS clipboard without any prompt; kero now asks for confirmation first, matching the Ghostty app default (#8)
+- Security: stop terminal programs from silently reading your clipboard — an OSC 52 escape sequence (for example from a remote SSH host) could previously read the macOS clipboard without any prompt; Sora now asks for confirmation first, matching the Ghostty app default (#8)
 - Warn before pasting text that looks like it could execute commands, matching Ghostty's paste protection
 - Add color themes: Settings → Colors picks a theme per appearance — kero's Default Light/Dark plus all 485 bundled Ghostty themes — recoloring the terminal, window chrome, sidebars, and editor live. The built-in Defaults keep the GitHub palette and translucent sidebar; every other theme colors the sidebar too
 - Fix fuzzy-looking terminal text: font thickening was unintentionally always on, making glyphs heavier and softer than stock Ghostty
@@ -114,7 +114,7 @@ set in the Xcode project.
 ## [0.1.4]
 
 - Add "Session Contents Restored" divider to restored terminals
-- set TERM_PROGRAM to Kero
+- set TERM_PROGRAM to Sora
 - fix embedded language highlighting in markdown
 
 ## [0.1]
