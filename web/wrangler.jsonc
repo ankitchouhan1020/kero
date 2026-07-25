@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kero",
+  "name": "sora",
   "compatibility_date": "2026-07-20",
   "compatibility_flags": ["nodejs_compat"],
   // TanStack Start's server entry. The @cloudflare/vite-plugin bundles this
@@ -8,8 +8,9 @@
   "main": "@tanstack/react-start/server-entry",
   "observability": {
     "enabled": true
-  }
+  },
+  "workers_dev": true,
 
-  // To serve from your own domain, add routes once kero.sh is on Cloudflare:
+  // Add after the kero.sh zone is moved to this Cloudflare account:
   // "routes": [{ "pattern": "kero.sh", "custom_domain": true }]
 }

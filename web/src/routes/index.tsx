@@ -14,16 +14,16 @@ type Release = { version: string; minSystem: string; dmg: string }
 const RELEASES_ORIGIN = 'https://releases.ankitchouhan.dev'
 const APPCAST_URL = `${RELEASES_ORIGIN}/appcast.xml`
 const X_URL = 'https://x.com/localhost_4173'
-const GITHUB_URL = 'https://github.com/ankitchouhan1020/kero'
+const GITHUB_URL = 'https://github.com/ankitchouhan1020/sora'
 // Cask lives in ankitchouhan1020/homebrew-tap, so the tap has to be named explicitly.
 // `--cask` is optional — brew falls back to casks, and the tap has no `sora` formula.
 const BREW_COMMAND = 'brew install ankitchouhan1020/tap/sora'
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
-  version: '0.1.11',
+  version: '0.1.27',
   minSystem: '15.6',
-  dmg: `${RELEASES_ORIGIN}/sora-0.1.11.dmg`,
+  dmg: `${RELEASES_ORIGIN}/sora-0.1.27.dmg`,
 }
 
 /**
@@ -135,6 +135,27 @@ const FEATURES: { group: string; rows: Row[] }[] = [
     ],
   },
   {
+    group: 'local automation',
+    rows: [
+      {
+        name: 'Bundled sora command',
+        detail: 'open projects, create visible terminal tabs, send input, and read recent output from scripts',
+      },
+      {
+        name: 'MCP for coding agents',
+        detail: 'the same controls are available as six focused tools over standard input and output',
+      },
+      {
+        name: 'Visible by design',
+        detail: 'automated commands run in ordinary Sora tabs, where you can watch, inspect, or take over',
+      },
+      {
+        name: 'Local and opt-in',
+        detail: 'disabled by default; when enabled, a signed bundled helper connects over a private per-user socket',
+      },
+    ],
+  },
+  {
     group: 'the terminal itself',
     rows: [
       {
@@ -200,6 +221,10 @@ const FAQ: { q: string; a: ReactNode }[] = [
     a: 'No telemetry, no analytics. The only network call Sora makes is the update check against releases.ankitchouhan.dev.',
   },
   {
+    q: 'Can coding agents control Sora?',
+    a: 'Yes. Enable local automation in Settings to use the bundled sora command or its MCP server. Commands stay visible in normal terminal tabs, and no network port or background daemon is opened.',
+  },
+  {
     q: 'What happens to my sessions when I quit?',
     a: 'Projects, tabs, and pane layout come back on relaunch. Each terminal reopens as a fresh shell in its old directory, with the previous scrollback restored above a "Session Contents Restored" divider.',
   },
@@ -218,7 +243,7 @@ function Home() {
       <header className="flex flex-col gap-3">
         <h1 className="flex items-center gap-2.5 text-2xl font-bold tracking-[0.02em]">
           <img
-            src="/kero-icon.png"
+            src="/sora-icon.png"
             alt=""
             width={100}
             height={100}
@@ -272,8 +297,8 @@ function Home() {
 
       <figure className="m-0 flex flex-col gap-2">
         <img
-          src="/kero-screenshot.png"
-          alt="Sora showing a project's terminal session with the git panel open"
+          src="/sora-screenshot.png"
+          alt="Sora showing a project terminal with the process and port inspector open"
           width={2286}
           height={1568}
           className="block w-full rounded-lg border border-border bg-card"

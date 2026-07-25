@@ -1,6 +1,6 @@
-# Kero — website
+# Sora — website
 
-Landing page for **Kero**, the native terminal workspace for macOS.
+Landing page for **Sora**, the native terminal workspace for macOS.
 
 ## Stack
 
@@ -29,9 +29,11 @@ bun run deploy        # vite build → wrangler deploy
 `@cloudflare/vite-plugin` generates the deploy config, so plain `wrangler deploy`
 picks it up. `bun run preview` serves the built Worker locally.
 
-Config lives in [`wrangler.jsonc`](wrangler.jsonc) (worker name, compatibility
-flags). To serve from `kero.sh`, uncomment the `routes` entry there once the zone
-is on Cloudflare. Run `bun run cf-typegen` after adding any bindings.
+Config lives in [`wrangler.jsonc`](wrangler.jsonc). Deployments use the
+maintainer-owned Cloudflare account selected by Wrangler and publish to the
+Worker's `workers.dev` address. The `kero.sh` custom-domain route is ready to
+enable after that zone is moved from its current Cloudflare account. Run
+`bun run cf-typegen` after adding any bindings.
 
 ## Notes
 
@@ -39,8 +41,15 @@ is on Cloudflare. Run `bun run cf-typegen` after adding any bindings.
   palette that mirrors the macOS app (`kero/Theme.swift`).
 - Add more components with `bunx shadcn@latest add <name>` — the project is
   already configured for Base UI (`components.json` → `"style": "base-nova"`).
-- The download URL and version live in the `LATEST` constant at the top of
-  [`src/routes/index.tsx`](src/routes/index.tsx). Bump it on each release.
-- The hero product shot is [`public/kero-screenshot.png`](public/kero-screenshot.png)
-  (a real app screenshot with transparent padding + shadow) — swap the file to
-  update it.
+- The Worker reads the latest version and download URL from the Sparkle appcast;
+  update the fallback in [`src/routes/index.tsx`](src/routes/index.tsx) when releasing.
+- The hero product shot is [`public/sora-screenshot.png`](public/sora-screenshot.png)
+  — swap the file to update it.
+
+## Cutover and rollback
+
+Verify the `workers.dev` deployment, download link, and Homebrew command first.
+After the `kero.sh` zone is available in the same account, uncomment its custom
+domain route in `wrangler.jsonc`, deploy, verify HTTPS and DNS, then remove the
+old host. Wrangler keeps deployment history; rollback with
+`bunx wrangler rollback` from this directory.

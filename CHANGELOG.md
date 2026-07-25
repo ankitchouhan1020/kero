@@ -12,6 +12,8 @@ set in the Xcode project.
 
 ## [unrelease]
 
+- Refresh the Sora website with local automation details and deploy it to the maintainer-owned Cloudflare Worker
+
 ## [0.1.27]
 
 - Add opt-in local automation with a bundled `sora` CLI and MCP server for opening projects and controlling visible terminal tabs — without opening a network port
