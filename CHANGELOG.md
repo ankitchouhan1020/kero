@@ -12,6 +12,8 @@ set in the Xcode project.
 
 ## [unrelease]
 
+- Opening the Ctrl-Tab switcher no longer highlights whichever tab happens to be under the stationary pointer
+
 ## [0.1.29]
 
 - Add a project-scoped Beads panel for reviewing, filtering, claiming, closing, reopening, and handing agent tasks back to the terminal
