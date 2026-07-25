@@ -448,18 +448,17 @@ final class Project: nonisolated ObservableObject, nonisolated Identifiable {
 
     // MARK: - Tab selection
 
-    /// Moves a dragged tab across `targetID`: after it when moving right, or
-    /// before it when moving left. Selection continues to follow its tab ID.
-    func moveTab(_ draggedID: UUID, to targetID: UUID) {
-        guard draggedID != targetID,
-              let draggedIndex = tabs.firstIndex(where: { $0.id == draggedID }),
-              let targetIndex = tabs.firstIndex(where: { $0.id == targetID })
-        else { return }
-
-        var reorderedTabs = tabs
-        let draggedTab = reorderedTabs.remove(at: draggedIndex)
-        reorderedTabs.insert(draggedTab, at: targetIndex)
-        tabs = reorderedTabs
+    /// Moves a dragged tab across a target in the same visible category:
+    /// after it when moving right, or before it when moving left. Selection
+    /// continues to follow its tab ID.
+    func moveTabWithinCategory(_ draggedID: UUID, to targetID: UUID) {
+        TabCategory.reorder(
+            &tabs,
+            moving: draggedID,
+            to: targetID,
+            identifiedBy: \.id,
+            categorizedBy: \.category
+        )
     }
 
     func select(index: Int) {

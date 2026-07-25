@@ -240,7 +240,11 @@ private struct SessionTabsView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 3) {
                     ForEach(TabCategory.groups(project.tabs, by: \.category), id: \.category) { group in
-                        categoryHeader(group.category, count: group.values.count)
+                        categoryHeader(
+                            group.category,
+                            count: group.values.count,
+                            containsSelection: group.values.contains { $0.id == project.selectedTabID }
+                        )
                         if !collapsedCategories.contains(group.category) {
                             ForEach(group.values) { tab in
                                 tabItem(tab)
@@ -262,13 +266,13 @@ private struct SessionTabsView: View {
             .onChange(of: project.selectedTabID) { _, id in
                 guard let id else { return }
                 withAnimation(.easeInOut(duration: 0.2)) {
-                    proxy.scrollTo(id)
+                    proxy.scrollTo(scrollTarget(for: id))
                 }
             }
             .onAppear {
                 // Restored sessions may open with an off-screen active tab.
                 guard let id = project.selectedTabID else { return }
-                DispatchQueue.main.async { proxy.scrollTo(id) }
+                DispatchQueue.main.async { proxy.scrollTo(scrollTarget(for: id)) }
             }
             .mask {
                 HStack(spacing: 0) {
@@ -305,8 +309,11 @@ private struct SessionTabsView: View {
         .onPreferenceChange(TabFramePreferenceKey.self) { tabFrames = $0 }
     }
 
-    private func categoryHeader(_ category: TabCategory, count: Int) -> some View {
-        Button {
+    private func categoryHeader(
+        _ category: TabCategory, count: Int, containsSelection: Bool
+    ) -> some View {
+        let isCollapsed = collapsedCategories.contains(category)
+        return Button {
             withAnimation(.easeInOut(duration: 0.15)) {
                 if !collapsedCategories.insert(category).inserted {
                     collapsedCategories.remove(category)
@@ -319,7 +326,11 @@ private struct SessionTabsView: View {
                 Text("\(count)")
                     .monospacedDigit()
                     .foregroundStyle(.tertiary)
-                Image(systemName: collapsedCategories.contains(category) ? "chevron.right" : "chevron.down")
+                if isCollapsed && containsSelection {
+                    Image(systemName: "checkmark.circle.fill")
+                        .accessibilityHidden(true)
+                }
+                Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
                     .font(.system(size: 7, weight: .bold))
             }
             .font(.system(size: 10, weight: .medium))
@@ -329,6 +340,17 @@ private struct SessionTabsView: View {
             .contentShape(RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
+        .id(category)
+        .accessibilityLabel("\(category.rawValue) tabs, \(count)")
+        .accessibilityValue(isCollapsed ? "Collapsed" : "Expanded")
+        .accessibilityAddTraits(isCollapsed && containsSelection ? .isSelected : [])
+    }
+
+    private func scrollTarget(for tabID: UUID) -> AnyHashable {
+        guard let tab = project.tabs.first(where: { $0.id == tabID }),
+              collapsedCategories.contains(tab.category)
+        else { return AnyHashable(tabID) }
+        return AnyHashable(tab.category)
     }
 
     private func tabItem(_ tab: PaneTab) -> some View {
@@ -371,7 +393,7 @@ private struct SessionTabsView: View {
             $0.key != source && $0.value.contains(location)
         })?.key else { return }
         withAnimation(.easeInOut(duration: 0.12)) {
-            project.moveTab(source, to: target)
+            project.moveTabWithinCategory(source, to: target)
         }
     }
 
@@ -585,6 +607,11 @@ private struct TabItemChrome: View {
     var body: some View {
         Button(action: select) {
             HStack(spacing: 5) {
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 8, weight: .bold))
+                        .accessibilityHidden(true)
+                }
                 Image(systemName: systemImage)
                     .font(.system(size: 9, weight: .medium))
                     .foregroundStyle(isSelected ? AnyShapeStyle(Color(nsColor: Theme.accent)) : AnyShapeStyle(.tertiary))
@@ -626,6 +653,7 @@ private struct TabItemChrome: View {
             .contentShape(RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
         // Cap tab width so a long title truncates instead of stretching the
         // tab; short titles still shrink to fit (maxWidth is an upper bound).
         .frame(maxWidth: 220)

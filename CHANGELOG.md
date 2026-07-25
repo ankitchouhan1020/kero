@@ -12,7 +12,7 @@ set in the Xcode project.
 
 ## [unrelease]
 
-- Group tabs into collapsible Agents, Files, Commands, and Terminals sections
+- Group tabs into accessible, collapsible Agents, Files, Commands, and Terminals sections while preserving tab navigation and reordering
 - Enable the bundled `sora` CLI and MCP server by default; local automation can still be switched off in Settings
 - Refresh the Sora website with local automation details and deploy it to the maintainer-owned Cloudflare Worker
 

@@ -30,6 +30,25 @@ nonisolated enum TabCategory: String, CaseIterable {
         }
     }
 
+    /// Reorders only within a derived category, preserving the canonical tab
+    /// array used by keyboard navigation and close-to-the-right actions.
+    static func reorder<Value, ID: Equatable>(
+        _ values: inout [Value],
+        moving sourceID: ID,
+        to targetID: ID,
+        identifiedBy id: (Value) -> ID,
+        categorizedBy category: (Value) -> Self
+    ) {
+        guard sourceID != targetID,
+              let sourceIndex = values.firstIndex(where: { id($0) == sourceID }),
+              let targetIndex = values.firstIndex(where: { id($0) == targetID }),
+              category(values[sourceIndex]) == category(values[targetIndex])
+        else { return }
+
+        let value = values.remove(at: sourceIndex)
+        values.insert(value, at: targetIndex)
+    }
+
     /// A tab belongs to one group. Agent work anywhere in a split wins;
     /// otherwise only the focused pane determines its activity group.
     static func derive(

@@ -21,4 +21,22 @@ let groups = TabCategory.groups(tabs, by: \.category)
 assert(groups.map(\.category) == [.agents, .files, .terminals])
 assert(groups.map { $0.values.map(\.id) } == [[2], [1, 3], [4]])
 
+var reordered = tabs
+TabCategory.reorder(
+    &reordered,
+    moving: 1,
+    to: 3,
+    identifiedBy: \.id,
+    categorizedBy: \.category
+)
+assert(reordered.map(\.id) == [2, 3, 1, 4])
+TabCategory.reorder(
+    &reordered,
+    moving: 2,
+    to: 1,
+    identifiedBy: \.id,
+    categorizedBy: \.category
+)
+assert(reordered.map(\.id) == [2, 3, 1, 4]) // Cross-category drag is ignored.
+
 print("Tab category tests passed")
