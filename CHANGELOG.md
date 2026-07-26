@@ -12,6 +12,8 @@ set in the Xcode project.
 
 ## [unrelease]
 
+## [0.1.30]
+
 - Opening the Ctrl-Tab switcher no longer highlights whichever tab happens to be under the stationary pointer
 - Sessions you never open no longer cost any GPU memory. Reopening a window used to draw every restored session straight away, holding a full-size buffer for each whether you looked at it or not; now a pane claims one only when you first view it, and claims one buffer less than before. A pane you have already viewed keeps its buffer until you close it — switching away stops it drawing, but does not hand the memory back.
 
