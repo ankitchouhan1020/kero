@@ -23,6 +23,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA50000000000000000000A0 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		AA50000000000000000000A1 /* Local.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.example.xcconfig; sourceTree = "<group>"; };
 		FF3FDD73300B6A7400112486 /* Sora Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sora Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000000000000000000001 /* sora */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sora; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000000000000000000002 /* SoraCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoraCLI.swift; sourceTree = "<group>"; };
@@ -99,9 +101,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA50000000000000000000A2 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				AA50000000000000000000A0 /* Debug.xcconfig */,
+				AA50000000000000000000A1 /* Local.example.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		FF3FDD6A300B6A7400112486 = {
 			isa = PBXGroup;
 			children = (
+				AA50000000000000000000A2 /* Config */,
 				FF3FDD75300B6A7400112486 /* kero */,
 				BB0000000000000000000010 /* sora-cli */,
 				BB0000000000000000000011 /* Shared */,
@@ -161,6 +173,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FF3FDD7E300B6A7600112486 /* Build configuration list for PBXNativeTarget "kero" */;
 			buildPhases = (
+				AA40000000000000000000A0 /* Build Alacritty bridge */,
 				FF3FDD6F300B6A7400112486 /* Sources */,
 				FF3FDD70300B6A7400112486 /* Frameworks */,
 				FF3FDD71300B6A7400112486 /* Resources */,
@@ -242,6 +255,30 @@
 			);
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AA40000000000000000000A0 /* Build Alacritty bridge */ = {
+			isa = PBXShellScriptBuildPhase;
+			inputPaths = (
+				"$(SRCROOT)/Vendor/alacritty-bridge/Cargo.lock",
+				"$(SRCROOT)/Vendor/alacritty-bridge/Cargo.toml",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/graphics_event_loop.rs",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/kitty_graphics.rs",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/kitty_graphics_tracking.rs",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/lib.rs",
+				"$(SRCROOT)/scripts/build-alacritty-bridge.sh",
+			);
+			name = "Build Alacritty bridge";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/alacritty-bridge/libkero_alacritty.a",
+			);
+			shellPath = /bin/zsh;
+			shellScript = (
+				"\"${SRCROOT}/scripts/build-alacritty-bridge.sh\"",
+				"",
+			);
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BB0000000000000000000030 /* Sources */ = {
@@ -385,10 +422,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.30;
+				MARKETING_VERSION = 0.1.31;
 				OTHER_CODE_SIGN_FLAGS = "--identifier $(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev.helper;
 				PRODUCT_NAME = sora;
@@ -401,10 +438,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.30;
+				MARKETING_VERSION = 0.1.31;
 				OTHER_CODE_SIGN_FLAGS = "--identifier $(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.helper;
 				PRODUCT_NAME = sora;
@@ -415,24 +452,38 @@
 		};
 		FF3FDD7F300B6A7600112486 /* Debug configuration for PBXNativeTarget "kero" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA50000000000000000000A0 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Dev";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = kero/kero.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/alacritty-bridge/include",
+				);
 				INFOPLIST_FILE = kero/Info.plist;
+				KERO_DISPLAY_NAME = "Sora Debug";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)/alacritty-bridge",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.30;
+				MARKETING_VERSION = 0.1.31;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lkero_alacritty",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev;
 				PRODUCT_NAME = "Sora Debug";
 				REGISTER_APP_GROUPS = YES;
@@ -440,8 +491,10 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "kero/kero-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				WRAPPER_NAME = "$(KERO_DISPLAY_NAME).app";
 			};
 			name = Debug;
 		};
@@ -453,18 +506,31 @@
 				CODE_SIGN_ENTITLEMENTS = kero/kero.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/alacritty-bridge/include",
+				);
 				INFOPLIST_FILE = kero/Info.plist;
+				KERO_DISPLAY_NAME = Sora;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)/alacritty-bridge",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.30;
+				MARKETING_VERSION = 0.1.31;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lkero_alacritty",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora;
 				PRODUCT_NAME = Sora;
 				REGISTER_APP_GROUPS = YES;
@@ -472,8 +538,10 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "kero/kero-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				WRAPPER_NAME = "$(KERO_DISPLAY_NAME).app";
 			};
 			name = Release;
 		};

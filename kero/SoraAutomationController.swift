@@ -57,7 +57,7 @@ enum SoraAutomationController {
                 throw failure(.terminalExited, "Terminal has exited")
             }
             guard let output = TerminalHistorySerializer.previewText(
-                from: session.terminalView, maxLines: lines, maxColumns: 10_000
+                from: session.surface, maxLines: lines, maxColumns: 10_000
             ) else {
                 throw failure(.outputUnavailable, "Terminal output is not available yet")
             }

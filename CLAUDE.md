@@ -71,3 +71,8 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 - Do not commit or push without clear authority from the active profile or the current user request.
 - If a required sync or push is blocked, stop and report the exact command and error.
 <!-- END BEADS INTEGRATION -->
+- [CHANGELOG.md](CHANGELOG.md) is the product changelog for end users, not a
+  development log. Describe only the final user-visible outcome intended to
+  ship. Never add or revise release notes for incremental fixes, refactors,
+  implementation details, or regressions introduced and resolved while a
+  feature is still in progress on an unreleased branch.

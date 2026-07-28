@@ -22,9 +22,9 @@
 	<!-- User-visible name. CFBundleName drives the app menu (bold menu next to
 	     the Apple menu); CFBundleDisplayName is what Finder/Dock show. -->
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>$(KERO_DISPLAY_NAME)</string>
 	<key>CFBundleDisplayName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>$(KERO_DISPLAY_NAME)</string>
 
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
@@ -41,7 +41,7 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>New $(PRODUCT_NAME) Project Here</string>
+				<string>New $(KERO_DISPLAY_NAME) Project Here</string>
 			</dict>
 			<key>NSMessage</key>
 			<string>openInKero</string>
