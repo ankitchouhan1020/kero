@@ -19,6 +19,8 @@ struct TerminalHostView: NSViewRepresentable {
     var onFocused: () -> Void = {}
     /// Splits this pane on the given edge — wired to the context-menu items.
     var onSplit: (PaneDropEdge) -> Void = { _ in }
+    var onNewBrowserTab: (String?) -> Void = { _ in }
+    var onNewBrowserPane: (String?) -> Void = { _ in }
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -31,6 +33,8 @@ struct TerminalHostView: NSViewRepresentable {
         terminal.setSurfaceVisible(true)
         terminal.onBecomeFirstResponder = onFocused
         terminal.splitTarget.onSplit = onSplit
+        terminal.splitTarget.onNewBrowserTab = onNewBrowserTab
+        terminal.splitTarget.onNewBrowserPane = onNewBrowserPane
         let scrollbar = session.overlayScrollbar
         // Kero's visual insets live inside the backend as window padding (see
         // KeroTerminalView+Ghostty), so that a padding-color of `extend` can
@@ -65,6 +69,8 @@ struct TerminalHostView: NSViewRepresentable {
         session.surface.setSurfaceVisible(true)
         session.surface.onBecomeFirstResponder = onFocused
         session.surface.splitTarget.onSplit = onSplit
+        session.surface.splitTarget.onNewBrowserTab = onNewBrowserTab
+        session.surface.splitTarget.onNewBrowserPane = onNewBrowserPane
         let container = view as? TerminalContainerView
         container?.activateSurfaceAfterLayout()
         container?.focusOnAppear = isFocused
@@ -88,6 +94,8 @@ struct TerminalHostView: NSViewRepresentable {
         // session gets fresh callbacks when its host is recreated.
         terminal.onBecomeFirstResponder = nil
         terminal.splitTarget.onSplit = nil
+        terminal.splitTarget.onNewBrowserTab = nil
+        terminal.splitTarget.onNewBrowserPane = nil
         container.terminal = nil
     }
 

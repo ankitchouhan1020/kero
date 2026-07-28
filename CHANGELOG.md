@@ -19,6 +19,7 @@ the original feature bullet instead of adding separate entries for them.
 - Prevent terminal tabs from crashing after switching sessions or resizing during a partial redraw
 - Files created in a terminal now use your system's default permissions instead of being made private to your user
 - Terminal sessions now inherit your shell locale instead of Sora setting `LANG`
+- Open native browser tabs and split panes from the command palette or terminal/editor context menus, with a combined address/search field, navigation controls, page sharing, and restored URLs
 
 ## [0.1.32]
 
