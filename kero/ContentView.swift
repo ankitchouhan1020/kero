@@ -163,14 +163,24 @@ private struct MainHeaderView: View {
     var body: some View {
         GeometryReader { geo in
             HStack(spacing: 8) {
+                if !manager.isLeftSidebarVisible {
+                    ChromeIconButton(
+                        systemImage: "sidebar.left",
+                        tooltip: "Toggle Left Sidebar (⌘B)",
+                        tooltipAlignment: .leading
+                    ) {
+                        manager.toggleLeftSidebar()
+                    }
+                }
                 if let project = manager.selectedProject {
                     // Everything in the header that isn't the scrollable tab
                     // strip: leading inset + trailing padding (8), HStack
                     // spacings (16), sidebar toggle (24), "+" and spacing (26),
                     // and the exit-zoom button (24 + 8 spacing) while shown.
+                    let hiddenLeftToggleWidth: CGFloat = manager.isLeftSidebarVisible ? 0 : 32
                     SessionTabsView(
                         project: project,
-                        maxStripWidth: max(0, geo.size.width - leadingInset - 74 - (manager.isPaneZoomed ? 32 : 0))
+                        maxStripWidth: max(0, geo.size.width - leadingInset - hiddenLeftToggleWidth - 74 - (manager.isPaneZoomed ? 32 : 0))
                     )
                 }
                 WindowDragArea()

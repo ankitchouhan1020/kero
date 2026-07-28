@@ -16,6 +16,10 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+## [0.1.32]
+
+- The left sidebar toggle remains available in the title bar after hiding the sidebar
+
 ## [0.1.31]
 
 - File previews now refresh after files are changed outside Sora
