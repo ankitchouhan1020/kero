@@ -67,7 +67,9 @@ done
 if [[ ${#slices[@]} -eq 1 ]]; then
   cp "${slices[1]}" "${OUTPUT}"
 else
-  lipo -create "${slices[@]}" -output "${OUTPUT}"
+  tmp="${WORK_DIR}/libkero_alacritty.a"
+  lipo -create "${slices[@]}" -output "${tmp}"
+  cp "${tmp}" "${OUTPUT}"
 fi
 
 echo "[+] staged ${OUTPUT} (${ARCHS})"
