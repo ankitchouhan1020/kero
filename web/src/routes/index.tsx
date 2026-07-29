@@ -31,9 +31,9 @@ const AGENT_PROMPT =
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
-  version: '0.1.27',
+  version: '0.2.0',
   minSystem: '15.6',
-  dmg: `${RELEASES_ORIGIN}/sora-0.1.27.dmg`,
+  dmg: `${RELEASES_ORIGIN}/sora-0.2.0.dmg`,
 }
 
 /**
@@ -97,7 +97,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       {
         name: 'Sessions per project',
         detail:
-          'open as many terminal tabs as a project needs with Cmd+T, each with its own directory and scrollback',
+          'open terminals, files, diffs, and browser tabs; grouped tab sections keep busy projects readable',
       },
       {
         name: 'Split panes',
@@ -111,7 +111,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       },
       {
         name: 'Command palette',
-        detail: 'Cmd+P to jump to any project or session, or run any command',
+        detail: 'Cmd+P to jump to any project, tab, session, or command',
       },
     ],
   },
@@ -121,7 +121,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       {
         name: 'Git panel',
         detail:
-          'stage, unstage, discard, and commit — amend included — beside the shell that made the changes',
+          'stage, unstage, discard, commit, fetch, pull, push, stash, and inspect diffs beside the shell',
       },
       {
         name: 'Inline diffs',
@@ -138,9 +138,9 @@ const FEATURES: { group: string; rows: Row[] }[] = [
           'browse the working tree, open a file, edit it with tree-sitter highlighting, Cmd+S to save',
       },
       {
-        name: 'Session info',
+        name: 'Beads and session info',
         detail:
-          'the processes running under a session and the TCP ports they are listening on',
+          'review project tasks, plus the processes and TCP ports running under the selected session',
       },
     ],
   },
@@ -173,8 +173,8 @@ const FEATURES: { group: string; rows: Row[] }[] = [
         detail: 'zsh, fish, or bash exactly as you configured it — prompt, aliases, dotfiles and all',
       },
       {
-        name: 'Built on libghostty',
-        detail: "Ghostty's terminal core, embedded and hosted natively by Sora",
+        name: 'Terminal backends',
+        detail: "Ghostty's terminal core by default, with an optional Alacritty backend",
       },
       {
         name: 'Desktop notifications',
@@ -186,8 +186,8 @@ const FEATURES: { group: string; rows: Row[] }[] = [
         detail: 'OSC 9;4 progress shows as a slim bar above the terminal, error and pause states included',
       },
       {
-        name: 'Fonts',
-        detail: 'ships with JetBrains Mono and Nerd Font symbols; swap in any monospace family and size',
+        name: 'Fonts and themes',
+        detail: 'ships with JetBrains Mono, Nerd Font symbols, CJK font support, and shared app themes',
       },
       {
         name: 'Quiet updates',
@@ -267,8 +267,8 @@ function Home() {
             />
           </p>
           <p className="mt-3.5 text-muted-foreground">
-            A native macOS workspace built around the terminal — projects, persistent
-            sessions, files, and git in one window.
+            A native macOS workspace built around the terminal — projects, tabs,
+            browser panes, files, diffs, and git in one window.
             <br />
             Free, no telemetry, no subscription.
           </p>
@@ -313,7 +313,7 @@ function Home() {
           className="block w-full rounded-lg border border-border bg-card"
         />
         <figcaption className="text-[13px] text-muted-foreground">
-          Projects, tabs, the info panel open beside it
+          Projects, grouped tabs, and the right-side panels beside the terminal
         </figcaption>
       </figure>
 

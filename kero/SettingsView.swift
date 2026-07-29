@@ -36,13 +36,6 @@ struct SettingsView: View {
         .frame(width: 900, height: 700)
         .background(SettingsBackdrop())
         .tint(SettingsPalette.accent)
-        .onMoveCommand { direction in
-            switch direction {
-            case .up: moveSelection(-1)
-            case .down: moveSelection(1)
-            default: break
-            }
-        }
     }
 
     @ViewBuilder
@@ -401,12 +394,6 @@ struct SettingsView: View {
         TerminalFont.resolve(family: settings.fontFamily, size: CGFloat(settings.fontSize))
     }
 
-    private func moveSelection(_ step: Int) {
-        let panes = SettingsPane.allCases
-        guard let index = panes.firstIndex(of: selectedPane) else { return }
-        selectedPane = panes[(index + step + panes.count) % panes.count]
-    }
-
     /// The compact catalog of popular themes shared by both terminal backends,
     /// split by the appearance slot they suit.
     private static let darkThemeNames = Theme.commonDarkThemes.map(\.name)
@@ -457,6 +444,17 @@ private enum SettingsPane: String, CaseIterable, Identifiable {
     }
 
     var shortcutKey: KeyEquivalent {
+        switch self {
+        case .general: "1"
+        case .appearance: "2"
+        case .terminal: "3"
+        case .editor: "4"
+        case .automation: "5"
+        case .updates: "6"
+        }
+    }
+
+    var shortcutLabel: String {
         switch self {
         case .general: "1"
         case .appearance: "2"
@@ -534,6 +532,7 @@ private struct SettingsPaneHeader: View {
                 Text(pane.title)
                     .font(.title3.weight(.semibold))
                     .tracking(-0.2)
+                    .accessibilityAddTraits(.isHeader)
             }
 
             Text(pane.subtitle)
@@ -565,6 +564,7 @@ private struct SettingsSectionCard<Content: View>: View {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(SettingsPalette.primaryText)
+                    .accessibilityAddTraits(.isHeader)
                 if let detail {
                     Text(detail)
                         .font(.caption)
@@ -619,11 +619,14 @@ private struct ConfigPathBadge: View {
                     .fill(.quaternary.opacity(0.7))
             )
             .help(help)
+            .accessibilityLabel("Settings file path")
+            .accessibilityValue(help)
     }
 }
 
 private struct SettingsSidebar: View {
     @Binding var selection: SettingsPane
+    @FocusState private var focusedPane: SettingsPane?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -666,8 +669,10 @@ private struct SettingsSidebar: View {
                     SettingsSidebarRow(
                         pane: pane,
                         isSelected: selection == pane,
+                        isFocused: focusedPane == pane,
                         select: { selection = pane }
                     )
+                    .focused($focusedPane, equals: pane)
                 }
             }
             .padding(.horizontal, 10)
@@ -677,12 +682,29 @@ private struct SettingsSidebar: View {
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(SettingsPalette.sidebar)
+        .onAppear { focusedPane = selection }
+        .onChange(of: selection) { focusedPane = $0 }
+        .onChange(of: focusedPane) { if let pane = $0 { selection = pane } }
+        .onMoveCommand { direction in
+            switch direction {
+            case .up: moveSelection(-1)
+            case .down: moveSelection(1)
+            default: break
+            }
+        }
+    }
+
+    private func moveSelection(_ step: Int) {
+        let panes = SettingsPane.allCases
+        guard let index = panes.firstIndex(of: selection) else { return }
+        selection = panes[(index + step + panes.count) % panes.count]
     }
 }
 
 private struct SettingsSidebarRow: View {
     let pane: SettingsPane
     let isSelected: Bool
+    let isFocused: Bool
     let select: () -> Void
 
     @State private var hovering = false
@@ -708,6 +730,12 @@ private struct SettingsSidebarRow: View {
             .padding(.vertical, 5)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(rowBackground)
+            .overlay {
+                if isFocused && !isSelected {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(SettingsPalette.accent.opacity(0.85), lineWidth: 1.5)
+                }
+            }
             .overlay(alignment: .leading) {
                 if isSelected {
                     Capsule(style: .continuous)
@@ -721,7 +749,9 @@ private struct SettingsSidebarRow: View {
         .buttonStyle(.plain)
         .keyboardShortcut(pane.shortcutKey, modifiers: .command)
         .onHover { hovering = $0 }
-        .accessibilityLabel(pane.title)
+        .accessibilityLabel("\(pane.title) settings")
+        .accessibilityHint("Opens the \(pane.title) settings pane. Command \(pane.shortcutLabel).")
+        .accessibilityValue(isSelected ? "Selected" : "")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 
@@ -885,7 +915,9 @@ private struct ThemeOption: View {
             .contentShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(theme.title)
+        .accessibilityLabel("\(theme.title) appearance")
+        .accessibilityValue(isSelected ? "Selected" : "")
+        .accessibilityHint("Sets the Settings and app appearance mode.")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
@@ -974,7 +1006,9 @@ private struct TerminalBackendOption: View {
             .contentShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(backend.displayName)
+        .accessibilityLabel("\(backend.displayName) terminal engine")
+        .accessibilityValue(isSelected ? "Selected" : "")
+        .accessibilityHint(backend.settingsSummary)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
