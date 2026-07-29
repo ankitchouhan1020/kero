@@ -16,6 +16,8 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+## [0.2.1]
+
 - Sidebar headers now align with macOS window controls.
 - Command-running terminals now stay in the Terminals tab group instead of splitting into a separate Commands group.
 - Terminals no longer inject the legacy Kero CLI token; use the bundled `sora` helper for local automation.
