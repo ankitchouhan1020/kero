@@ -327,16 +327,21 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
             "TERM": "xterm-256color",
             "COLORTERM": "truecolor",
         ]
-        environment.merge(
-            KeroCLIService.shared.terminalEnvironment,
-            uniquingKeysWith: { _, cliValue in cliValue }
-        )
         if let pathOverride, !pathOverride.isEmpty {
             environment["PATH"] = pathOverride
+        } else if let helpers = bundledHelpersPath() {
+            let inherited = ProcessInfo.processInfo.environment["PATH"]
+                ?? "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+            environment["PATH"] = "\(helpers):\(inherited)"
         }
         // Locale belongs to the user's shell environment. Kero's app language
         // must never synthesize or override LANG/LC_* for terminal processes.
         return environment
+    }
+
+    private static func bundledHelpersPath() -> String? {
+        let url = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers", isDirectory: true)
+        return FileManager.default.fileExists(atPath: url.path) ? url.path : nil
     }
 
     private struct LaunchArtifacts {

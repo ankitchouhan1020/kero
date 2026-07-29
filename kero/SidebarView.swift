@@ -15,6 +15,7 @@ struct SidebarView: View {
     @Environment(\.openSettings) private var openSettings
     @Environment(\.colorScheme) private var colorScheme
     @AppStorage("leftSidebarWidth") private var width: Double = 220
+    @State private var isFullScreen = false
     @State private var draggedProjectID: UUID?
     @State private var projectFrames: [UUID: CGRect] = [:]
 
@@ -22,7 +23,11 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header-height strip housing the traffic-light buttons and the
             // control for collapsing this sidebar.
-            HStack(spacing: 0) {
+            HStack(spacing: 8) {
+                Text("Projects")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
                 WindowDragArea()
                     .frame(maxWidth: .infinity)
                 ChromeIconButton(
@@ -32,8 +37,10 @@ struct SidebarView: View {
                     manager.toggleLeftSidebar()
                 }
             }
+            .padding(.leading, isFullScreen ? 8 : 78)
             .padding(.trailing, 8)
             .frame(height: 38)
+            .background(FullScreenStateReader(isFullScreen: $isFullScreen))
 
             ScrollView {
                 VStack(spacing: 3) {

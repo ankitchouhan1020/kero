@@ -156,8 +156,12 @@ struct RightSidebarView: View {
             tabButton(.beads, systemImage: "circle.grid.cross", title: "Beads", help: "Beads")
         }
         .padding(.horizontal, 8)
-        .padding(.top, 12)
-        .padding(.bottom, 4)
+        .frame(height: 38)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color(nsColor: Theme.divider))
+                .frame(height: 1)
+        }
     }
 
     private func tabButton(_ panel: RightPanel, systemImage: String, title: String, help: String) -> some View {
@@ -170,6 +174,7 @@ struct RightSidebarView: View {
                     Image(systemName: systemImage)
                     Text(title)
                 }
+                .sidebarFont(size: 11, weight: .medium)
                 Image(systemName: systemImage)
                     .sidebarFont(size: 10, weight: .medium)
                 Text(title)

@@ -16,6 +16,8 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Sidebar headers now align with macOS window controls and label the Projects sidebar.
+- Terminals no longer inject the legacy Kero CLI token; use the bundled `sora` helper for local automation.
 - Settings now use a custom macOS surface with a fixed sidebar, compact pane headers, and aligned setting cards.
 
 ## [0.2.0]

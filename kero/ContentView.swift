@@ -238,7 +238,7 @@ private struct MainHeaderView: View {
     }
 }
 
-private struct FullScreenStateReader: NSViewRepresentable {
+struct FullScreenStateReader: NSViewRepresentable {
     @Binding var isFullScreen: Bool
 
     func makeNSView(context: Context) -> NSView {
