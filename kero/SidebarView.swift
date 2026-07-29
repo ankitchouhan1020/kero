@@ -26,8 +26,9 @@ struct SidebarView: View {
             HStack(spacing: 8) {
                 Text("Projects")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
+                    .layoutPriority(1)
                 WindowDragArea()
                     .frame(maxWidth: .infinity)
                 ChromeIconButton(
