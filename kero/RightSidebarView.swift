@@ -156,7 +156,7 @@ struct RightSidebarView: View {
             tabButton(.beads, systemImage: "circle.grid.cross", title: "Beads", help: "Beads")
         }
         .padding(.horizontal, 8)
-        .frame(height: 38)
+        .frame(height: 42)
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(Color(nsColor: Theme.divider))

@@ -228,7 +228,7 @@ private struct MainHeaderView: View {
             .padding(.trailing, 8)
             .frame(height: geo.size.height)
         }
-        .frame(height: 38)
+        .frame(height: 42)
         .background(FullScreenStateReader(isFullScreen: $isFullScreen))
         .overlay(alignment: .bottom) {
             Rectangle()

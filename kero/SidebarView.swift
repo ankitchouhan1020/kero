@@ -23,12 +23,7 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header-height strip housing the traffic-light buttons and the
             // control for collapsing this sidebar.
-            HStack(spacing: 8) {
-                Text("Projects")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .layoutPriority(1)
+            HStack(spacing: 0) {
                 WindowDragArea()
                     .frame(maxWidth: .infinity)
                 ChromeIconButton(
@@ -40,7 +35,7 @@ struct SidebarView: View {
             }
             .padding(.leading, isFullScreen ? 8 : 78)
             .padding(.trailing, 8)
-            .frame(height: 38)
+            .frame(height: 42)
             .background(FullScreenStateReader(isFullScreen: $isFullScreen))
 
             ScrollView {

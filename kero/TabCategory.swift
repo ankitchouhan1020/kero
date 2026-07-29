@@ -7,14 +7,12 @@
 nonisolated enum TabCategory: String, CaseIterable {
     case agents = "Agents"
     case files = "Files"
-    case commands = "Commands"
     case terminals = "Terminals"
 
     var systemImage: String {
         switch self {
         case .agents: "sparkles"
         case .files: "doc.text"
-        case .commands: "chevron.left.forwardslash.chevron.right"
         case .terminals: "terminal"
         }
     }
@@ -50,7 +48,7 @@ nonisolated enum TabCategory: String, CaseIterable {
     }
 
     /// A tab belongs to one group. Agent work anywhere in a split wins;
-    /// otherwise only the focused pane determines its activity group.
+    /// otherwise files split out and terminal/command panes stay together.
     static func derive(
         hasAgentSession: Bool,
         focusedIsFileOrDiff: Bool,
@@ -58,7 +56,6 @@ nonisolated enum TabCategory: String, CaseIterable {
     ) -> Self {
         if hasAgentSession { return .agents }
         if focusedIsFileOrDiff { return .files }
-        if focusedTerminalRunsCommand { return .commands }
         return .terminals
     }
 }

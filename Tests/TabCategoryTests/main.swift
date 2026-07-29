@@ -1,5 +1,5 @@
 let categoryOrder = TabCategory.allCases
-assert(categoryOrder == [.agents, .files, .commands, .terminals])
+assert(categoryOrder == [.agents, .files, .terminals])
 
 func category(agent: Bool = false, file: Bool = false, command: Bool = false) -> TabCategory {
     TabCategory.derive(
@@ -10,7 +10,7 @@ func category(agent: Bool = false, file: Bool = false, command: Bool = false) ->
 }
 
 assert(category() == .terminals)
-assert(category(command: true) == .commands)
+assert(category(command: true) == .terminals)
 assert(category(file: true, command: true) == .files)
 assert(category(agent: true, file: true, command: true) == .agents)
 
