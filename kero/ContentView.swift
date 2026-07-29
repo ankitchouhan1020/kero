@@ -3,6 +3,7 @@
 //  kero
 //
 
+import AppKit
 import SwiftUI
 
 struct ContentView: View {
@@ -162,11 +163,12 @@ struct ContentView: View {
 private struct MainHeaderView: View {
     @ObservedObject var manager: TerminalManager
     @ObservedObject private var themeChanges = Theme.changes
+    @State private var isFullScreen = false
 
-    /// With the left sidebar hidden the header slides under the window's
-    /// traffic-light buttons, so inset its content to clear them.
+    /// With the left sidebar hidden in a normal window, clear the traffic lights.
+    /// Fullscreen has no traffic lights there, so reclaim that space.
     private var leadingInset: CGFloat {
-        manager.isLeftSidebarVisible ? 8 : 78
+        manager.isLeftSidebarVisible || isFullScreen ? 8 : 78
     }
 
     var body: some View {
@@ -227,10 +229,59 @@ private struct MainHeaderView: View {
             .frame(height: geo.size.height)
         }
         .frame(height: 38)
+        .background(FullScreenStateReader(isFullScreen: $isFullScreen))
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(Color(nsColor: Theme.divider))
                 .frame(height: 1)
+        }
+    }
+}
+
+private struct FullScreenStateReader: NSViewRepresentable {
+    @Binding var isFullScreen: Bool
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async { context.coordinator.attach(view.window) }
+        return view
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {
+        context.coordinator.attach(view.window)
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(isFullScreen: $isFullScreen) }
+
+    final class Coordinator {
+        private let isFullScreen: Binding<Bool>
+        private weak var window: NSWindow?
+        private var observers: [NSObjectProtocol] = []
+
+        init(isFullScreen: Binding<Bool>) {
+            self.isFullScreen = isFullScreen
+        }
+
+        func attach(_ window: NSWindow?) {
+            guard self.window !== window else { return }
+            observers.forEach(NotificationCenter.default.removeObserver)
+            observers.removeAll()
+            self.window = window
+            update()
+            guard let window else { return }
+            for name in [NSWindow.didEnterFullScreenNotification, NSWindow.didExitFullScreenNotification] {
+                observers.append(NotificationCenter.default.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
+                    self?.update()
+                })
+            }
+        }
+
+        private func update() {
+            isFullScreen.wrappedValue = window?.styleMask.contains(.fullScreen) == true
+        }
+
+        deinit {
+            observers.forEach(NotificationCenter.default.removeObserver)
         }
     }
 }
