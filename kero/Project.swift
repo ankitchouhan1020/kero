@@ -443,6 +443,16 @@ final class Project: nonisolated ObservableObject, nonisolated Identifiable {
         closeBatch(tabs.flatMap(\.allContents))
     }
 
+    /// Closes every tab in a visible activity group.
+    func closeAll(in category: TabCategory) {
+        closeBatch(tabs.filter { $0.category == category }.flatMap(\.allContents))
+    }
+
+    /// Closes terminal tabs that are not currently selected.
+    func closeInactiveTerminals() {
+        closeBatch(tabs.filter { $0.category == .terminals && $0.id != selectedTabID }.flatMap(\.allContents))
+    }
+
     /// Asks whether to save before discarding an edited file, matching the
     /// standard macOS Save / Don't Save / Cancel prompt. Presented as a sheet
     /// on `window` (app-modal only when there's no window) so it doesn't block

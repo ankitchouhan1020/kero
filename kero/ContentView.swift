@@ -285,6 +285,7 @@ private struct SessionTabsView: View {
                                         : Color(nsColor: Theme.accent).opacity(0.11)
                                 )
                         }
+                        .contextMenu { categoryContextMenu(for: group.category) }
                     }
                 }
             }
@@ -359,10 +360,6 @@ private struct SessionTabsView: View {
                 Text("\(count)")
                     .monospacedDigit()
                     .foregroundStyle(.tertiary)
-                if isCollapsed && containsSelection {
-                    Image(systemName: "checkmark.circle.fill")
-                        .accessibilityHidden(true)
-                }
                 Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
                     .font(.system(size: 7, weight: .bold))
             }
@@ -433,6 +430,17 @@ private struct SessionTabsView: View {
     private func endTabDrag() {
         draggedTabID = nil
         NSCursor.arrow.set()
+    }
+
+    @ViewBuilder
+    private func categoryContextMenu(for category: TabCategory) -> some View {
+        if category == .terminals {
+            Button("Close Inactive Terminals") { project.closeInactiveTerminals() }
+                .disabled(!project.tabs.contains { $0.category == .terminals && $0.id != project.selectedTabID })
+            Button("Close All Terminals") { project.closeAll(in: category) }
+        } else {
+            Button("Close All \(category.rawValue)") { project.closeAll(in: category) }
+        }
     }
 
     @ViewBuilder

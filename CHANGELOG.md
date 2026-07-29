@@ -16,9 +16,16 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Settings now use a custom macOS surface with a fixed sidebar, compact pane headers, and aligned setting cards.
+
+## [0.2.0]
+
+- Settings now use a cleaner sidebar layout with grouped macOS panes
+- Tab group headers now offer bulk close actions, including closing all files and inactive terminals, without the extra selected-group checkmark
 - Prevent terminal tabs from crashing after switching sessions or resizing during a partial redraw
 - Files created in a terminal now use your system's default permissions instead of being made private to your user
 - Terminal sessions now inherit your shell locale instead of Sora setting `LANG`
+- CJK monospace fonts now appear in the terminal font picker
 - Open native browser tabs and split panes from the command palette or terminal/editor context menus, with a combined address/search field, navigation controls, page sharing, and restored URLs
 
 ## [0.1.32]
