@@ -16,7 +16,8 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
-- Fix: never set `LANG` env for the terminal session
+- Files created in a terminal now use your system's default permissions instead of being made private to your user
+- Terminal sessions now inherit your shell locale instead of Sora setting `LANG`
 
 ## [0.1.32]
 
