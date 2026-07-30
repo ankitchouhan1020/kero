@@ -10,6 +10,7 @@ nonisolated enum AgentKind: String {
     case claude
     case codex
     case gemini
+    case grok
     case pi
     case cursorAgent
     case openCode
@@ -21,6 +22,7 @@ nonisolated enum AgentKind: String {
         "claude": .claude,
         "codex": .codex,
         "gemini": .gemini,
+        "grok": .grok,
         "pi": .pi,
         "cursor-agent": .cursorAgent,
         "opencode": .openCode,

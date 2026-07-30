@@ -162,7 +162,7 @@ struct SettingsView: View {
                     sizeControl("Text size", value: $settings.fontSize, range: AppSettings.fontSizeRange)
                 }
 
-                TerminalSampleBlock(font: previewFont)
+                TerminalSampleBlock(font: previewFont, thicken: settings.fontThicken)
                     .padding(.horizontal, 12)
                     .padding(.top, 4)
                     .padding(.bottom, 12)
@@ -771,31 +771,90 @@ private struct SettingsSidebarRow: View {
 
 private struct TerminalSampleBlock: View {
     let font: NSFont
+    let thicken: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Text("sora")
-                    .foregroundStyle(.green)
-                Text("~/dev/sora")
-                    .foregroundStyle(SettingsPalette.secondaryText)
-                Text("git status --short")
-            }
-            Text(" M kero/SettingsView.swift")
-                .foregroundStyle(.orange)
-            Text("2 panes · Beads ready · editor synced")
-                .foregroundStyle(SettingsPalette.secondaryText)
-        }
-        .font(Font(font))
+        FontThickenSample(
+            font: font,
+            thicken: thicken,
+            foreground: Theme.terminal(dark: true).foregroundNSColor
+        )
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(nsColor: Theme.terminal(dark: true).backgroundNSColor))
-        .foregroundStyle(Color(nsColor: Theme.terminal(dark: true).foregroundNSColor))
         .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .strokeBorder(.primary.opacity(0.12), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("sora, ~/dev/sora, git status --short. Modified SettingsView.swift. 2 panes, Beads ready, editor synced.")
+    }
+}
+
+private struct FontThickenSample: NSViewRepresentable {
+    let font: NSFont
+    let thicken: Bool
+    let foreground: NSColor
+
+    func makeNSView(context: Context) -> FontThickenSampleView {
+        FontThickenSampleView()
+    }
+
+    func updateNSView(_ view: FontThickenSampleView, context: Context) {
+        view.font = font
+        view.thicken = thicken
+        view.foreground = foreground
+        view.invalidateIntrinsicContentSize()
+        view.needsDisplay = true
+    }
+}
+
+private final class FontThickenSampleView: NSView {
+    var font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+    var thicken = false
+    var foreground = NSColor.textColor
+
+    override var isFlipped: Bool { true }
+
+    override var intrinsicContentSize: NSSize {
+        NSSize(width: NSView.noIntrinsicMetric, height: ceil(font.boundingRectForFont.height) * 3 + 12)
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        context.setAllowsFontSmoothing(true)
+        context.setShouldSmoothFonts(thicken)
+        context.setAllowsAntialiasing(true)
+        context.setShouldAntialias(true)
+
+        let secondary = foreground.withAlphaComponent(0.65)
+        let lines: [NSAttributedString] = [
+            joined([
+                ("sora", NSColor.systemGreen),
+                ("   ~/dev/sora", secondary),
+                ("   git status --short", foreground),
+            ]),
+            joined([(" M kero/SettingsView.swift", NSColor.systemOrange)]),
+            joined([("2 panes · Beads ready · editor synced", secondary)]),
+        ]
+        var y: CGFloat = 0
+        let lineHeight = ceil(font.boundingRectForFont.height) + 6
+        for line in lines {
+            line.draw(at: NSPoint(x: 0, y: y))
+            y += lineHeight
+        }
+    }
+
+    private func joined(_ parts: [(String, NSColor)]) -> NSAttributedString {
+        let line = NSMutableAttributedString()
+        for (text, color) in parts {
+            line.append(NSAttributedString(
+                string: text,
+                attributes: [.font: font, .foregroundColor: color]
+            ))
+        }
+        return line
     }
 }
 

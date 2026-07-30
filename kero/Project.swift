@@ -26,8 +26,15 @@ final class Project: nonisolated ObservableObject, nonisolated Identifiable {
     /// moves (see `panelRoot(followingSessionAt:)`).
     @Published var customDirectory: String?
     @Published var tabs: [PaneTab] = []
-    @Published var selectedTabID: UUID?
+    @Published var selectedTabID: UUID? {
+        didSet {
+            guard selectedTabID != oldValue, let selectedTabID else { return }
+            recentTabIDs.removeAll { $0 == selectedTabID }
+            recentTabIDs.insert(selectedTabID, at: 0)
+        }
+    }
 
+    private var recentTabIDs: [UUID] = []
     private let fallbackName: String
     /// Sessions publish their own changes (title, directory); re-publish them
     /// so the project name and views observing the project stay current.
@@ -97,19 +104,41 @@ final class Project: nonisolated ObservableObject, nonisolated Identifiable {
 
     // MARK: - Project directory
 
-    /// Root for the file tree and git panels: the pinned directory when the
-    /// user set one (and it still exists on disk), else the closest git
-    /// repository containing `cwd`, else `cwd` itself — the
-    /// follow-the-terminal behavior used before projects had a directory.
-    /// The automatic repository root is re-derived on every call, so it
-    /// tracks the session in and out of repositories without sticking.
-    /// `isAutomatic` reports which branch produced the root, so labels can
-    /// say "(AUTO)" truthfully even when a vanished pin forced the fallback.
-    func panelRoot(followingSessionAt cwd: String) -> (root: String, isAutomatic: Bool) {
+    enum PanelRootSource: Equatable {
+        case pinned
+        case shell
+        case foreground(isWorktree: Bool)
+    }
+
+    /// Files, Git and Beads follow a pinned directory first, then an agent
+    /// that moved into another checkout, then the shell's repository.
+    func panelRoot(
+        followingSessionAt cwd: String,
+        foregroundAt foregroundCwd: String? = nil
+    ) -> (root: String, source: PanelRootSource) {
         if let pinned = customDirectory, FileManager.default.fileExists(atPath: pinned) {
-            return (pinned, false)
+            return (pinned, .pinned)
         }
-        return (Self.closestGitRepository(containing: cwd) ?? cwd, true)
+        let shellRoot = Self.closestGitRepository(containing: cwd) ?? cwd
+        if let foregroundCwd,
+           let foregroundRoot = Self.closestGitRepository(containing: foregroundCwd),
+           foregroundRoot != shellRoot {
+            return (
+                foregroundRoot,
+                .foreground(isWorktree: Self.isLinkedWorktree(foregroundRoot))
+            )
+        }
+        return (shellRoot, .shell)
+    }
+
+    private static func isLinkedWorktree(_ root: String) -> Bool {
+        let gitPath = (root as NSString).appendingPathComponent(".git")
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: gitPath, isDirectory: &isDirectory),
+              !isDirectory.boolValue,
+              let contents = try? String(contentsOfFile: gitPath, encoding: .utf8)
+        else { return false }
+        return contents.contains("/worktrees/")
     }
 
     /// The directory of the nearest enclosing git repository: walks up from
@@ -541,6 +570,20 @@ final class Project: nonisolated ObservableObject, nonisolated Identifiable {
         )
     }
 
+    /// Selected tab first, then tabs by most recent use, with untouched tabs
+    /// trailing in their visible strip order.
+    var tabsByRecency: [PaneTab] {
+        var seen = Set<UUID>()
+        return ([selectedTab].compactMap { $0 }
+            + recentTabIDs.compactMap { id in tabs.first { $0.id == id } }
+            + tabs)
+            .filter { seen.insert($0.id).inserted }
+    }
+
+    func resetTabRecency() {
+        recentTabIDs = selectedTabID.map { [$0] } ?? []
+    }
+
     func select(index: Int) {
         guard tabs.indices.contains(index) else { return }
         selectedTabID = tabs[index].id
@@ -673,6 +716,7 @@ final class Project: nonisolated ObservableObject, nonisolated Identifiable {
             browserObservations[browser.id] = nil
         }
         tabObservations[tabID] = nil
+        recentTabIDs.removeAll { $0 == tabID }
         tabs.remove(at: index)
         if selectedTabID == tabID {
             let neighbor = min(index, tabs.count - 1)

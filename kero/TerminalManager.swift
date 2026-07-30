@@ -865,6 +865,7 @@ final class TerminalManager: nonisolated ObservableObject {
             if let index = saved.selectedTabIndex, project.tabs.indices.contains(index) {
                 project.selectedTabID = project.tabs[index].id
             }
+            project.resetTabRecency()
             projects.append(project)
         }
         guard !projects.isEmpty else { return false }

@@ -46,6 +46,22 @@ final class GitStatusModel: nonisolated ObservableObject {
         var changedRowID: String { "changed/" + path }
     }
 
+    nonisolated enum FileDecoration: Equatable, Sendable {
+        case modified, added, untracked, deleted, renamed, copied, conflict
+
+        var directoryPriority: Int {
+            switch self {
+            case .conflict: 7
+            case .deleted: 6
+            case .modified: 5
+            case .added: 4
+            case .untracked: 3
+            case .renamed: 2
+            case .copied: 1
+            }
+        }
+    }
+
     nonisolated struct RecentCommit: Identifiable, Equatable, Sendable {
         var id: String { hash }
         let hash: String
@@ -86,6 +102,7 @@ final class GitStatusModel: nonisolated ObservableObject {
     /// preserved while a cwd change is being resolved inside the same repo.
     @Published private(set) var repositoryIdentity = ""
     @Published private(set) var isRepo = false
+    @Published private(set) var fileDecorations: [String: FileDecoration] = [:]
     @Published private(set) var branch: String?
     @Published private(set) var headOID: String?
     @Published private(set) var hasHead = true
@@ -140,6 +157,27 @@ final class GitStatusModel: nonisolated ObservableObject {
 
     var repoRoot: String {
         topLevel.isEmpty ? rootPath : topLevel
+    }
+
+    func fileDecoration(for absolutePath: String, isDirectory: Bool) -> FileDecoration? {
+        guard isRepo, !topLevel.isEmpty else { return nil }
+        let repositoryPath = (topLevel as NSString).standardizingPath
+        let itemPath = (absolutePath as NSString).standardizingPath
+        let relativePath: String
+        if itemPath == repositoryPath {
+            relativePath = ""
+        } else {
+            let prefix = repositoryPath + "/"
+            guard itemPath.hasPrefix(prefix) else { return nil }
+            relativePath = String(itemPath.dropFirst(prefix.count))
+        }
+        if let decoration = fileDecorations[relativePath] { return decoration }
+        guard isDirectory, !relativePath.isEmpty else { return nil }
+        let prefix = relativePath + "/"
+        return fileDecorations
+            .filter { $0.key.hasPrefix(prefix) }
+            .map(\.value)
+            .max { $0.directoryPriority < $1.directoryPriority }
     }
 
     func absolutePath(for entry: Entry) -> String {
@@ -817,6 +855,7 @@ final class GitStatusModel: nonisolated ObservableObject {
         mergeEntries = []
         stagedEntries = []
         changedEntries = []
+        fileDecorations = [:]
         branches = []
         remotes = []
         recentCommits = []
@@ -889,6 +928,9 @@ final class GitStatusModel: nonisolated ObservableObject {
             entry.repositoryRoot = result.topLevel
             return entry
         }
+        fileDecorations = Dictionary(
+            uniqueKeysWithValues: entries.map { ($0.path, Self.fileDecoration(for: $0)) }
+        )
         mergeEntries = entries.filter(\.isConflict)
         stagedEntries = entries.filter {
             !$0.isConflict && $0.staged != "." && $0.staged != "?"
@@ -896,6 +938,17 @@ final class GitStatusModel: nonisolated ObservableObject {
         changedEntries = entries.filter {
             !$0.isConflict && $0.unstaged != "."
         }
+    }
+
+    nonisolated static func fileDecoration(for entry: Entry) -> FileDecoration {
+        let statuses = [entry.staged, entry.unstaged]
+        if entry.isConflict || statuses.contains("U") { return .conflict }
+        if statuses.contains("?") { return .untracked }
+        if entry.staged == "A" { return .added }
+        if statuses.contains("D") { return .deleted }
+        if statuses.contains("R") { return .renamed }
+        if statuses.contains("C") { return .copied }
+        return .modified
     }
 
     nonisolated enum StatusLoadResult: Equatable, Sendable {

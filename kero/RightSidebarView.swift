@@ -17,6 +17,7 @@ struct RightSidebarView: View {
     @StateObject private var beads = BeadsModel()
     @StateObject private var info = SessionInfoModel()
     @State private var applicationIsActive = NSApp.isActive
+    @State private var rootSource = Project.PanelRootSource.shell
     @AppStorage("rightSidebarWidth") private var width: Double = 240
 
     private var pollsSelectedPanel: Bool {
@@ -58,11 +59,14 @@ struct RightSidebarView: View {
                     case .files:
                         FileTreePanel(
                             model: fileTree,
+                            git: git,
                             session: manager.selectedSession,
+                            rootBadge: rootBadge,
                             currentFilePath: openFilePath,
                             openFile: { manager.openFile($0) },
                             openToSide: { manager.openFileToSide($0) },
-                            onRename: { manager.fileRenamed(from: $0, to: $1) }
+                            onRename: { manager.fileRenamed(from: $0, to: $1) },
+                            refreshGitStatus: { git.refresh() }
                         )
                     case .git:
                         GitPanel(
@@ -100,7 +104,7 @@ struct RightSidebarView: View {
                 )
             }
         }
-        .onAppear(perform: syncModels)
+        .onAppear { syncModels() }
         // Files and process information remain live while visible. Git is
         // event-driven: terminal/Git command completion and app activation
         // refresh it without a repeating main-run-loop source.
@@ -112,7 +116,7 @@ struct RightSidebarView: View {
                 } catch {
                     return
                 }
-                syncModels()
+                syncModels(refreshGitStatus: false)
             }
         }
         .onReceive(NotificationCenter.default.publisher(
@@ -127,7 +131,7 @@ struct RightSidebarView: View {
             applicationIsActive = false
         }
         .onChange(of: commandCompletionSequences) {
-            guard manager.panelTab == .git else { return }
+            guard manager.panelTab == .git || manager.panelTab == .files else { return }
             syncModels()
         }
         .onChange(of: manager.isPanelVisible) { syncModels() }
@@ -137,6 +141,7 @@ struct RightSidebarView: View {
         // session.workingDirectory); resync at once so automatically rooted
         // panels follow the terminal without waiting for another event.
         .onChange(of: manager.selectedSession?.workingDirectory) { syncModels() }
+        .onChange(of: manager.selectedSession?.foregroundDirectoryPath) { syncModels() }
         // Same for pinning/unpinning the project directory.
         .onChange(of: manager.selectedProject?.customDirectory) { syncModels() }
         .environment(
@@ -195,27 +200,36 @@ struct RightSidebarView: View {
         .accessibilityValue(isActive ? "Selected" : "Not selected")
     }
 
-    private func syncModels() {
+    private func syncModels(refreshGitStatus: Bool = true) {
         guard manager.isPanelVisible,
               let project = manager.selectedProject,
               let session = project.selectedSession
         else { return }
         let cwd = session.currentDirectoryPath
-        // Files and Git anchor to the project directory — pinned when the
-        // user set one, else the cwd's closest git repository — so they
-        // don't re-root as the terminal cds around a repo; Info describes
-        // the shell itself, showing its live cwd next to that root.
-        let (root, isAutoRoot) = project.panelRoot(followingSessionAt: cwd)
+        let (root, source) = project.panelRoot(
+            followingSessionAt: cwd,
+            foregroundAt: session.foregroundDirectoryPath
+        )
+        if rootSource != source { rootSource = source }
         switch manager.panelTab {
-        case .files: fileTree.sync(root: root)
+        case .files:
+            fileTree.sync(root: root)
+            if refreshGitStatus { git.sync(root: root) }
         case .git: git.sync(root: root)
         case .beads: beads.sync(root: root, executablePath: settings.beadsExecutable)
         case .info:
             info.sync(
-                root: cwd, projectRoot: root, projectRootIsAutomatic: isAutoRoot,
+                root: cwd, projectRoot: root, projectRootSource: source,
                 shellName: session.shellName, shellPid: session.shellPid
             )
         }
+    }
+
+    private var rootBadge: (text: String, description: String)? {
+        guard case .foreground(let isWorktree) = rootSource else { return nil }
+        return isWorktree
+            ? ("worktree", "Following the terminal agent's worktree")
+            : ("job", "Following the terminal job's repository")
     }
 }
 
@@ -246,16 +260,31 @@ private struct PanelHeader: View {
 
 private struct FileTreePanel: View {
     @ObservedObject var model: FileTreeModel
+    @ObservedObject var git: GitStatusModel
     let session: TerminalSession?
+    let rootBadge: (text: String, description: String)?
     let currentFilePath: String?
     let openFile: (String) -> Void
     let openToSide: (String) -> Void
     let onRename: (_ oldPath: String, _ newPath: String) -> Void
+    let refreshGitStatus: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 PanelHeader(title: model.rootName, subtitle: model.rootPath)
+                if let rootBadge {
+                    Text(rootBadge.text)
+                        .sidebarFont(size: 9, weight: .medium)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.primary.opacity(0.09))
+                        )
+                        .accessibilityLabel(rootBadge.description)
+                }
                 Button {
                     NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: model.rootPath)])
                 } label: {
@@ -274,9 +303,10 @@ private struct FileTreePanel: View {
                 LazyVStack(spacing: 1) {
                     ForEach(model.items) { item in
                         FileTreeRow(
-                            model: model, item: item, session: session,
+                            model: model, git: git, item: item, session: session,
                             currentFilePath: currentFilePath,
-                            openFile: openFile, openToSide: openToSide, onRename: onRename
+                            openFile: openFile, openToSide: openToSide, onRename: onRename,
+                            refreshGitStatus: refreshGitStatus
                         )
                     }
                 }
@@ -289,6 +319,7 @@ private struct FileTreePanel: View {
 
 private struct FileTreeRow: View {
     @ObservedObject var model: FileTreeModel
+    @ObservedObject var git: GitStatusModel
     @ObservedObject private var themeChanges = Theme.changes
     let item: FileTreeModel.Item
     let session: TerminalSession?
@@ -296,6 +327,7 @@ private struct FileTreeRow: View {
     let openFile: (String) -> Void
     let openToSide: (String) -> Void
     let onRename: (_ oldPath: String, _ newPath: String) -> Void
+    let refreshGitStatus: () -> Void
 
     @State private var isHovering = false
     @State private var editingName = ""
@@ -305,6 +337,9 @@ private struct FileTreeRow: View {
 
     /// The file open in the active tab, so it reads as selected in the tree.
     private var isCurrent: Bool { !item.isDirectory && item.path == currentFilePath }
+    private var gitDecoration: GitStatusModel.FileDecoration? {
+        git.fileDecoration(for: item.path, isDirectory: item.isDirectory)
+    }
 
     var body: some View {
         if item.isDraft {
@@ -363,6 +398,7 @@ private struct FileTreeRow: View {
         }
         Button("Move to Trash", role: .destructive) {
             model.moveToTrash(item)
+            refreshGitStatus()
         }
     }
 
@@ -374,6 +410,7 @@ private struct FileTreeRow: View {
         let oldPath = item.path
         if let newPath = model.rename(item, to: editingName) {
             onRename(oldPath, newPath)
+            refreshGitStatus()
         }
     }
 
@@ -383,6 +420,7 @@ private struct FileTreeRow: View {
         guard item.isDraft, model.draft != nil else { return }
         if let created = model.commitDraft(name: editingName) {
             openFile(created)
+            refreshGitStatus()
         }
     }
 
@@ -407,9 +445,15 @@ private struct FileTreeRow: View {
                 leadingGlyphs
                 Text(item.name)
                     .sidebarFont(size: 11.5)
-                    .foregroundStyle(item.name.hasPrefix(".") ? .tertiary : .secondary)
+                    .foregroundStyle(fileNameColor)
                     .lineLimit(1)
                 Spacer(minLength: 0)
+                if let gitDecoration {
+                    Text(gitDecoration.badge)
+                        .sidebarFont(size: 9, weight: .semibold, design: .monospaced)
+                        .foregroundStyle(gitDecoration.color)
+                        .accessibilityHidden(true)
+                }
             }
             .padding(.leading, CGFloat(item.depth) * 12 + 6)
             .padding(.trailing, 6)
@@ -417,12 +461,23 @@ private struct FileTreeRow: View {
             .contentShape(RoundedRectangle(cornerRadius: 4))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(fileAccessibilityLabel)
         // Drag a row out as a file URL: onto the terminal (which inserts its
         // path) or into Finder and other apps. A click still opens/toggles;
         // the drag only begins once the pointer moves.
         .onDrag {
             NSItemProvider(object: URL(fileURLWithPath: item.path) as NSURL)
         }
+    }
+
+    private var fileNameColor: Color {
+        if let gitDecoration { return gitDecoration.color }
+        return item.name.hasPrefix(".") ? Color.secondary.opacity(0.55) : .secondary
+    }
+
+    private var fileAccessibilityLabel: String {
+        guard let gitDecoration else { return item.name }
+        return item.name + ", " + gitDecoration.accessibilityName
     }
 
     private var renameRow: some View {
@@ -505,6 +560,42 @@ private struct FileTreeRow: View {
                 .sidebarFont(size: 10)
                 .foregroundStyle(item.isDirectory ? Color(nsColor: Theme.accent).opacity(0.8) : Color.secondary)
                 .frame(width: 14)
+        }
+    }
+}
+
+private extension GitStatusModel.FileDecoration {
+    var badge: String {
+        switch self {
+        case .modified: "M"
+        case .added: "A"
+        case .untracked: "U"
+        case .deleted: "D"
+        case .renamed: "R"
+        case .copied: "C"
+        case .conflict: "!"
+        }
+    }
+
+    var accessibilityName: String {
+        switch self {
+        case .modified: "Modified"
+        case .added: "Added"
+        case .untracked: "Untracked"
+        case .deleted: "Deleted"
+        case .renamed: "Renamed"
+        case .copied: "Copied"
+        case .conflict: "Conflict"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .modified: Color(red: 0.82, green: 0.60, blue: 0.13)
+        case .added, .untracked: Color(red: 0.25, green: 0.73, blue: 0.31)
+        case .deleted: Color(red: 1.0, green: 0.48, blue: 0.45)
+        case .renamed, .copied: Color(red: 0.35, green: 0.65, blue: 1.0)
+        case .conflict: Color(red: 0.74, green: 0.55, blue: 1.0)
         }
     }
 }
@@ -1936,19 +2027,26 @@ private struct InfoPanel: View {
     private var projectDirectorySection: some View {
         if !model.projectRootPath.isEmpty {
             GitSectionHeader(
-                title: "PROJECT DIRECTORY"
-                    + (model.projectRootIsAutomatic ? " (AUTO)" : ""),
+                title: projectDirectoryTitle,
                 count: 0,
                 isCollapsed: $projectDirectoryCollapsed, actions: [],
-                helpText: "Files and Git anchor to this directory. When "
-                    + "automatic, it follows the closest Git repository "
-                    + "containing the shell's current directory; a directory "
-                    + "set manually from the project's context menu is always "
-                    + "used as-is."
+                helpText: "Files, Git and Beads anchor to this directory. "
+                    + "Automatic roots follow the shell's repository or a "
+                    + "foreground agent that moved into another checkout; a "
+                    + "directory pinned from the project's context menu always wins."
             )
             if !projectDirectoryCollapsed {
                 directoryGroup(path: model.projectRootPath)
             }
+        }
+    }
+
+    private var projectDirectoryTitle: String {
+        switch model.projectRootSource {
+        case .pinned: "PROJECT DIRECTORY"
+        case .shell: "PROJECT DIRECTORY (AUTO)"
+        case .foreground(let isWorktree):
+            isWorktree ? "PROJECT DIRECTORY (WORKTREE)" : "PROJECT DIRECTORY (JOB)"
         }
     }
 

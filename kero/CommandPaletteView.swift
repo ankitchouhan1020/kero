@@ -3,6 +3,7 @@
 //  kero
 //
 
+import AppKit
 import SwiftUI
 
 /// Groups palette rows under a header — built-in actions vs. open sessions.
@@ -52,6 +53,7 @@ struct CommandPaletteView: View {
 
     @State private var query = ""
     @State private var selection = 0
+    @State private var pointerBaseline = NSPoint.zero
     @FocusState private var searchFocused: Bool
 
     var body: some View {
@@ -67,7 +69,7 @@ struct CommandPaletteView: View {
                 .padding(.top, 110)
         }
         .ignoresSafeArea()
-        .onExitCommand { dismissFromKeyboard() }
+        .onExitCommand { handleEscapeFromKeyboard() }
         .onDisappear { manager.restoreFocusAfterCommandPalette() }
     }
 
@@ -304,7 +306,7 @@ struct CommandPaletteView: View {
                     .focused($searchFocused)
                     .onKeyPress(.downArrow) { move(1); return .handled }
                     .onKeyPress(.upArrow) { move(-1); return .handled }
-                    .onKeyPress(.escape) { dismissFromKeyboard(); return .handled }
+                    .onKeyPress(.escape) { handleEscapeFromKeyboard(); return .handled }
                     .onSubmit { runSelected() }
             }
             .padding(.horizontal, 14)
@@ -333,6 +335,7 @@ struct CommandPaletteView: View {
         .onAppear {
             query = ""
             selection = 0
+            pointerBaseline = NSEvent.mouseLocation
             // Defer to the next runloop tick: assigning focus synchronously
             // inside the appearance pass can be dropped before the field
             // editor is ready, which left the palette opening unfocused.
@@ -342,6 +345,7 @@ struct CommandPaletteView: View {
         }
         .onChange(of: query) {
             selection = 0
+            pointerBaseline = NSEvent.mouseLocation
         }
     }
 
@@ -434,8 +438,10 @@ struct CommandPaletteView: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isSelected ? Color.primary.opacity(0.09) : .clear)
         )
-        .onHover { hovering in
-            if hovering { selection = index }
+        .onContinuousHover { phase in
+            guard case .active = phase,
+                  NSEvent.mouseLocation != pointerBaseline else { return }
+            selection = index
         }
     }
 
@@ -460,6 +466,14 @@ struct CommandPaletteView: View {
 
     private func dismiss() {
         manager.dismissCommandPalette()
+    }
+
+    private func handleEscapeFromKeyboard() {
+        if query.isEmpty {
+            dismissFromKeyboard()
+        } else {
+            query = ""
+        }
     }
 
     /// Escape reaches us as AppKit's `cancelOperation:`, which SwiftUI can

@@ -15,6 +15,7 @@ final class TabSwitcherController: ObservableObject {
     @Published private(set) var isPresented = false
     @Published private(set) var highlightedTabID: UUID?
     @Published private(set) var terminalPreviews: [UUID: String] = [:]
+    @Published private(set) var orderedTabIDs: [UUID] = []
 
     private weak var activeProject: Project?
     private var originalTabID: UUID?
@@ -115,6 +116,13 @@ final class TabSwitcherController: ObservableObject {
         dismiss(commitSelection: false)
     }
 
+    func orderedTabs(in project: Project) -> [PaneTab] {
+        let ordered = orderedTabIDs.compactMap { id in
+            project.tabs.first { $0.id == id }
+        }
+        return ordered.isEmpty ? project.tabs : ordered
+    }
+
     func highlight(_ tabID: UUID, in project: Project) {
         guard acceptsPointerHighlight,
               isPresented,
@@ -135,7 +143,8 @@ final class TabSwitcherController: ObservableObject {
             previewTask?.cancel()
             activeProject = project
             originalTabID = selectedID
-            highlightedTabID = selectedID
+            orderedTabIDs = project.tabsByRecency.map(\.id)
+            highlightedTabID = orderedTabIDs[reverse ? orderedTabIDs.count - 1 : 1]
             acceptsPointerHighlight = false
             let validContentIDs = Set(project.tabs.flatMap(\.allContents).map(\.id))
             terminalPreviews = terminalPreviews.filter {
@@ -148,18 +157,15 @@ final class TabSwitcherController: ObservableObject {
             return true
         }
 
+        let order = orderedTabs(in: project).map(\.id)
         guard let currentHighlightedTabID = highlightedTabID,
-              let currentIndex = project.tabs.firstIndex(
-                where: { $0.id == currentHighlightedTabID }
-              )
+              let currentIndex = order.firstIndex(of: currentHighlightedTabID)
         else {
             cancel()
             return false
         }
         let offset = reverse ? -1 : 1
-        let nextIndex = (currentIndex + offset + project.tabs.count) % project.tabs.count
-        let nextTab = project.tabs[nextIndex]
-        highlightedTabID = nextTab.id
+        highlightedTabID = order[(currentIndex + offset + order.count) % order.count]
         return true
     }
 
@@ -324,7 +330,8 @@ struct TabSwitcherOverlay: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let columnCount = columnsPerRow(available: geometry.size.width)
+            let tabs = controller.orderedTabs(in: project)
+            let columnCount = columnsPerRow(count: tabs.count, available: geometry.size.width)
 
             ZStack {
                 Color.clear
@@ -338,11 +345,10 @@ struct TabSwitcherOverlay: View {
                             alignment: .leading,
                             spacing: TabSwitcherLayout.gridSpacing
                         ) {
-                            ForEach(Array(project.tabs.enumerated()), id: \.element.id) {
-                                index, tab in
+                            ForEach(tabs, id: \.id) { tab in
                                 TabSwitcherCard(
                                     tab: tab,
-                                    index: index,
+                                    index: project.tabs.firstIndex { $0.id == tab.id } ?? 0,
                                     isHighlighted: tab.id == controller.highlightedTabID,
                                     terminalPreviews: controller.terminalPreviews,
                                     highlight: {
@@ -360,6 +366,7 @@ struct TabSwitcherOverlay: View {
                     .frame(
                         width: overlayWidth(columns: columnCount),
                         height: gridHeight(
+                            count: tabs.count,
                             columns: columnCount,
                             available: geometry.size.height
                         )
@@ -423,14 +430,14 @@ struct TabSwitcherOverlay: View {
             : .primary.opacity(0.18)
     }
 
-    private func columnsPerRow(available: CGFloat) -> Int {
+    private func columnsPerRow(count: Int, available: CGFloat) -> Int {
         let horizontalInsets = 44 + TabSwitcherLayout.gridInset * 2
         let usable = max(
             TabSwitcherLayout.cardWidth,
             available - horizontalInsets
         )
         let fitting = Int(usable / TabSwitcherLayout.cardWidth)
-        return min(5, max(1, min(project.tabs.count, fitting)))
+        return min(5, max(1, min(count, fitting)))
     }
 
     private func gridColumns(count: Int) -> [GridItem] {
@@ -448,8 +455,8 @@ struct TabSwitcherOverlay: View {
             + TabSwitcherLayout.gridInset * 2
     }
 
-    private func gridHeight(columns: Int, available: CGFloat) -> CGFloat {
-        let rows = (project.tabs.count + columns - 1) / columns
+    private func gridHeight(count: Int, columns: Int, available: CGFloat) -> CGFloat {
+        let rows = (count + columns - 1) / columns
         let contentHeight = CGFloat(rows) * TabSwitcherLayout.cardHeight
             + TabSwitcherLayout.gridInset * 2
         return min(

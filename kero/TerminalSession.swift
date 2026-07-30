@@ -24,6 +24,8 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
     @Published var workingDirectory: String?
     @Published var hasExited = false
     @Published private(set) var activity: TerminalActivity = .terminal
+    /// Live cwd of a foreground job such as an agent that moved to a worktree.
+    @Published private(set) var foregroundDirectoryPath: String?
     @Published private(set) var commandLifecycle = TerminalCommandLifecycle()
 
     /// The emulator driving this session. Fixed for the session's lifetime —
@@ -200,10 +202,18 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
             while let self, !Task.isCancelled, !self.hasExited {
                 if let shellPID = self.shellPid {
                     let foregroundPID = self.surface.foregroundPid
-                    let snapshot = await Task.detached(priority: .utility) {
-                        TerminalProcessSnapshot.capture(shellPID: shellPID)
+                    let (snapshot, foregroundDirectory) = await Task.detached(priority: .utility) {
+                        (
+                            TerminalProcessSnapshot.capture(shellPID: shellPID),
+                            foregroundPID.flatMap { pid in
+                                pid != shellPID ? processWorkingDirectory(pid: pid) : nil
+                            }
+                        )
                     }.value
                     guard !Task.isCancelled, !self.hasExited else { return }
+                    if self.foregroundDirectoryPath != foregroundDirectory {
+                        self.foregroundDirectoryPath = foregroundDirectory
+                    }
                     let observed = TerminalActivity.classify(
                         shellPID: shellPID,
                         foregroundPID: foregroundPID,

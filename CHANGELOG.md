@@ -16,6 +16,12 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+## [0.2.2]
+
+- Files, Git, and Beads now follow coding agents into separate checkouts, clearly label worktrees, and show Git change badges beside files and folders.
+- Ctrl-Tab now switches by recent use, selected grouped tabs stay visible as the window changes, and command-palette keyboard and pointer selection stay predictable.
+- Grok sessions now join Sora's Agents tab group, and the typography preview reflects the Thicker text setting.
+
 ## [0.2.1]
 
 - Sidebar headers now align with macOS window controls.

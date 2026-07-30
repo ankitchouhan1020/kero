@@ -294,6 +294,7 @@ private struct SessionTabsView: View {
     @State private var overflow = StripOverflow()
     @State private var draggedTabID: UUID?
     @State private var tabFrames: [UUID: CGRect] = [:]
+    @State private var tabSizes: [UUID: CGSize] = [:]
     @State private var collapsedCategories: Set<TabCategory> = []
     /// Tab currently showing the inline rename field, if any.
     @State private var renamingTabID: UUID?
@@ -356,10 +357,13 @@ private struct SessionTabsView: View {
                     proxy.scrollTo(scrollTarget(for: id))
                 }
             }
+            .onChange(of: maxStripWidth) { scrollToSelectedTab(using: proxy) }
+            .onChange(of: project.tabs.map(\.id)) { scrollToSelectedTab(using: proxy) }
+            .onChange(of: tabSizes) { scrollToSelectedTab(using: proxy) }
+            .onChange(of: collapsedCategories) { scrollToSelectedTab(using: proxy) }
             .onAppear {
                 // Restored sessions may open with an off-screen active tab.
-                guard let id = project.selectedTabID else { return }
-                DispatchQueue.main.async { proxy.scrollTo(scrollTarget(for: id)) }
+                DispatchQueue.main.async { scrollToSelectedTab(using: proxy) }
             }
             .mask {
                 HStack(spacing: 0) {
@@ -391,7 +395,17 @@ private struct SessionTabsView: View {
                 project.newSession()
             }
         }
-        .onPreferenceChange(TabFramePreferenceKey.self) { tabFrames = $0 }
+        .onPreferenceChange(TabFramePreferenceKey.self) { frames in
+            tabFrames = frames
+            let sizes = frames.mapValues(\.size)
+            if sizes != tabSizes { tabSizes = sizes }
+        }
+    }
+
+    private func scrollToSelectedTab(using proxy: ScrollViewProxy) {
+        guard let id = project.selectedTabID,
+              project.tabs.contains(where: { $0.id == id }) else { return }
+        DispatchQueue.main.async { proxy.scrollTo(scrollTarget(for: id)) }
     }
 
     private func categoryHeader(

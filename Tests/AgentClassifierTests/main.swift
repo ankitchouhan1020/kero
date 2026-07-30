@@ -12,6 +12,7 @@ let direct: [(String, AgentKind)] = [
     ("claude", .claude),
     ("codex", .codex),
     ("gemini", .gemini),
+    ("grok", .grok),
     ("pi", .pi),
     ("cursor-agent", .cursorAgent),
     ("opencode", .openCode),
