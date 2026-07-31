@@ -16,6 +16,8 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Switch directly to tabs with Ctrl+1–9, without also holding Shift
+
 ## [0.2.2]
 
 - Files, Git, and Beads now follow coding agents into separate checkouts, clearly label worktrees, and show Git change badges beside files and folders.
