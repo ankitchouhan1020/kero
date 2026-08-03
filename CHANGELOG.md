@@ -16,6 +16,7 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Terminal notifications play the system sound
 - Browser tabs now use a modern Safari user agent, fixing sites such as Bilibili that otherwise report an outdated browser
 - Switch directly to tabs with Ctrl+1–9, without also holding Shift
 
