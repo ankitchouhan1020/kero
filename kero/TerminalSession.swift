@@ -490,7 +490,7 @@ extension TerminalSession: TerminalBackendEvents {
     func terminalDidRingBell() {
         NSSound.beep()
         guard !surface.hasEffectiveTerminalFocus else { return }
-        TerminalNotificationService.shared.post(message: "Terminal bell")
+        TerminalNotificationService.shared.post(message: "Terminal bell", sessionID: id)
         if !NSApp.isActive {
             NSApp.requestUserAttention(.informationalRequest)
         }
@@ -531,7 +531,7 @@ extension TerminalSession: TerminalBackendEvents {
         guard !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return
         }
-        TerminalNotificationService.shared.post(message: message)
+        TerminalNotificationService.shared.post(message: message, sessionID: id)
     }
 
     func terminalDidRequestOpenURL(_ url: String) {
