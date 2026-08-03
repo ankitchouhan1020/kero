@@ -423,9 +423,9 @@ final class TerminalSession: NSObject, nonisolated ObservableObject, nonisolated
             let path = shellQuote(replayFileURL.path)
             commands.append("if [ -r \(path) ]; then /bin/cat \(path); /bin/rm -f \(path); fi")
         }
-        // Many terminal tools use TERM_PROGRAM as a capability hint. Each
-        // backend advertises a compatible identity so tools select protocols
-        // that Kero can actually render.
+        // SORA_TERM exposes the actual surface. TERM_PROGRAM remains a
+        // capability hint so tools select protocols Sora can actually render.
+        commands.append("export SORA_TERM=\(shellQuote(backend.environmentName))")
         let termProgram = backend.termProgram
         commands.append("export TERM_PROGRAM=\(shellQuote(termProgram.name))")
         if !termProgram.version.isEmpty {

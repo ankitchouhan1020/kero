@@ -16,6 +16,8 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Fix desktop notifications from Grok and other OSC 777 clients when using the Alacritty terminal backend
+
 - Terminal notifications play the system sound
 - Browser tabs now use a modern Safari user agent, fixing sites such as Bilibili that otherwise report an outdated browser
 - Switch directly to tabs with Ctrl+1–9, without also holding Shift
