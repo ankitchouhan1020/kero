@@ -16,6 +16,7 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Fix modified special keys and application-keypad input in Alacritty terminals, including Shift-Enter for multiline prompts in Claude Code
 - Clicking a terminal notification activates Sora and jumps to the session that posted it
 - Fix desktop notifications from Grok and other OSC 777 clients when using the Alacritty terminal backend
 
