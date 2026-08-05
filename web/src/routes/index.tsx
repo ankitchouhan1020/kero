@@ -102,7 +102,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       {
         name: 'Split panes',
         detail:
-          'Cmd+D splits right, Cmd+Shift+D splits down, Opt+Cmd+arrows moves focus between panes',
+          'Cmd+D splits right, Cmd+Shift+D splits down, and terminal links open in file or browser tabs and panes',
       },
       {
         name: 'Restored on relaunch',
@@ -135,7 +135,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       {
         name: 'Files panel',
         detail:
-          'browse the working tree, open a file, edit it with tree-sitter highlighting, Cmd+S to save',
+          'browse the working tree with Git status badges, open a file, edit with tree-sitter highlighting, Cmd+S to save',
       },
       {
         name: 'Beads and session info',
@@ -179,7 +179,7 @@ const FEATURES: { group: string; rows: Row[] }[] = [
       {
         name: 'Desktop notifications',
         detail:
-          'a bell in an unfocused session, or a notification escape from a long-running command, reaches Notification Center',
+          'bells and long-running commands reach Notification Center; click an alert to return to its session',
       },
       {
         name: 'Progress reports',
