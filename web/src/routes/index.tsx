@@ -31,9 +31,9 @@ const AGENT_PROMPT =
 
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
-  version: '0.2.2',
+  version: '0.2.3',
   minSystem: '15.6',
-  dmg: `${RELEASES_ORIGIN}/sora-0.2.2.dmg`,
+  dmg: `${RELEASES_ORIGIN}/sora-0.2.3.dmg`,
 }
 
 /**

@@ -16,17 +16,14 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
-- Prevent a rare crash while using the Ctrl-Tab switcher
+## [0.2.3]
 
-- Command-click local file paths in the terminal to reveal them in Finder, or Command-right-click paths and URLs to open them in new file or browser tabs and panes
-- Alacritty terminal panes now move the mouse pointer the way Ghostty panes do: programs can set shapes with OSC 22, mouse-reporting apps show the arrow, and a terminal reset restores the text cursor
-- Fix modified special keys and application-keypad input in Alacritty terminals, including Shift-Enter for multiline prompts in Claude Code
-- Clicking a terminal notification activates Sora and jumps to the session that posted it
-- Fix desktop notifications from Grok and other OSC 777 clients when using the Alacritty terminal backend
-
-- Terminal notifications play the system sound
-- Browser tabs now use a modern Safari user agent, fixing sites such as Bilibili that otherwise report an outdated browser
-- Switch directly to tabs with Ctrl+1–9, without also holding Shift
+- Command-click terminal links to reveal local files in Finder, or open files and websites directly in new Sora tabs and panes.
+- Terminal notifications now sound reliably, work from Alacritty sessions, and return you to the session that sent them when clicked.
+- Alacritty terminals now handle modified keys, Shift-Enter multiline prompts, application keypads, and app-controlled pointer shapes correctly.
+- Switch directly to tabs with Ctrl+1–9, without also holding Shift.
+- New sessions start in the project's pinned directory, and browser tabs work with sites that require a modern Safari identity.
+- Prevent rare Ctrl-Tab crashes and runaway Git metadata checks outside repositories.
 
 ## [0.2.2]
 
