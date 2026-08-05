@@ -16,6 +16,8 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+- Prevent a rare crash while using the Ctrl-Tab switcher
+
 - Command-click local file paths in the terminal to reveal them in Finder, or Command-right-click paths and URLs to open them in new file or browser tabs and panes
 - Alacritty terminal panes now move the mouse pointer the way Ghostty panes do: programs can set shapes with OSC 22, mouse-reporting apps show the arrow, and a terminal reset restores the text cursor
 - Fix modified special keys and application-keypad input in Alacritty terminals, including Shift-Enter for multiline prompts in Claude Code
