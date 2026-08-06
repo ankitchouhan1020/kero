@@ -12,11 +12,11 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sora — A native terminal workspace for macOS" },
+      { title: "Sora — Keep every coding thread within reach" },
       {
         name: "description",
         content:
-          "Sora is a native terminal workspace for macOS with projects, panes, files, git, and local automation for scripts and coding agents.",
+          "Sora is a native terminal workspace for macOS. Spaces keep agent sessions, repositories, files, diffs, and Git together while the terminal stays primary.",
       },
       { name: "theme-color", content: "#0d1117" },
     ],

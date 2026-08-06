@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { SiteLayout } from '@/components/site-layout'
-import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -18,17 +17,6 @@ const GITHUB_URL = 'https://github.com/ankitchouhan1020/sora'
 // Cask lives in ankitchouhan1020/homebrew-tap, so the tap has to be named explicitly.
 // `--cask` is optional — brew falls back to casks, and the tap has no `sora` formula.
 const BREW_COMMAND = 'brew install ankitchouhan1020/tap/sora'
-const MCP_CONFIG = `{
-  "mcpServers": {
-    "sora": {
-      "command": "/opt/homebrew/bin/sora",
-      "args": ["mcp"]
-    }
-  }
-}`
-const AGENT_PROMPT =
-  'Configure Sora for this project. Create .mcp.json with an MCP server named sora, command /opt/homebrew/bin/sora, and args ["mcp"]. If MCP is unsupported, including in Pi, use the sora CLI directly. Verify with sora status.'
-
 // Shown only if the appcast can't be reached; kept current so downloads still work.
 const FALLBACK: Release = {
   version: '0.3.0',
@@ -88,30 +76,36 @@ type Row = { name: string; detail: string }
 
 const FEATURES: { group: string; rows: Row[] }[] = [
   {
-    group: 'projects & sessions',
+    group: 'spaces & work',
     rows: [
       {
-        name: 'Projects, not windows',
-        detail: 'each repo is a project in the sidebar — Cmd+1–9 switches, Cmd+N adds one',
-      },
-      {
-        name: 'Sessions per project',
+        name: 'Spaces follow the goal',
         detail:
-          'open terminals, files, diffs, and browser tabs; grouped tab sections keep busy projects readable',
+          'keep related terminals, files, and repositories together even when the work crosses repo boundaries',
       },
       {
-        name: 'Split panes',
+        name: 'Your order stays yours',
+        detail:
+          'pin the threads you return to; temporary inspections stay below without moving or renaming your work',
+      },
+      {
+        name: 'Switch without losing place',
+        detail:
+          'click, press Cmd+1–9, or swipe across the sidebar to move between Spaces with every tab intact',
+      },
+      {
+        name: 'Split when it helps',
         detail:
           'Cmd+D splits right, Cmd+Shift+D splits down, and terminal links open in file or browser tabs and panes',
       },
       {
         name: 'Restored on relaunch',
         detail:
-          'quit and reopen: projects, tabs, and pane layout come back, each shell fresh beneath its previous scrollback',
+          'Spaces, tabs, and pane layouts return; each shell opens fresh beneath its restored scrollback',
       },
       {
         name: 'Command palette',
-        detail: 'Cmd+P to jump to any project, tab, session, or command',
+        detail: 'Cmd+P to jump to any Space, tab, session, or command',
       },
     ],
   },
@@ -149,11 +143,12 @@ const FEATURES: { group: string; rows: Row[] }[] = [
     rows: [
       {
         name: 'Bundled sora command',
-        detail: 'open projects, create visible terminal tabs, send input, and read recent output from scripts',
+        detail:
+          'create, select, rename, and remove Spaces; open visible terminals, send input, and read recent output',
       },
       {
         name: 'MCP for coding agents',
-        detail: 'the same controls are available as six focused tools over standard input and output',
+        detail: 'the same focused controls are available to agents over standard input and output',
       },
       {
         name: 'Visible by design',
@@ -204,10 +199,10 @@ const FEATURES: { group: string; rows: Row[] }[] = [
  * the mono grid — and go missing entirely on most non-Apple systems.
  */
 const SHORTCUTS: Row[] = [
-  { name: 'Cmd+N', detail: 'new project' },
-  { name: 'Cmd+T', detail: 'new session' },
+  { name: 'Cmd+N', detail: 'new Space' },
+  { name: 'Cmd+T', detail: 'new terminal' },
   { name: 'Cmd+W', detail: 'close the focused pane' },
-  { name: 'Cmd+1–9', detail: 'switch project' },
+  { name: 'Cmd+1–9', detail: 'switch Space' },
   { name: 'Ctrl+1–9', detail: 'switch tab' },
   { name: 'Ctrl+Tab', detail: 'open the tab switcher' },
   { name: 'Cmd+P', detail: 'command palette' },
@@ -242,7 +237,7 @@ const FAQ: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'What happens to my sessions when I quit?',
-    a: 'Projects, tabs, and pane layout come back on relaunch. Each terminal reopens as a fresh shell in its old directory, with the previous scrollback restored above a "Session Contents Restored" divider.',
+    a: 'Spaces, tabs, and pane layouts come back on relaunch. Each terminal reopens as a fresh shell in its old directory, with the previous scrollback restored above a "Session Contents Restored" divider.',
   },
   {
     q: 'Is this an IDE?',
@@ -259,16 +254,17 @@ function Home() {
       headerContent={
         <>
           <p className="text-foreground/70">
-            Your terminal, with the{' '}
-            <span className="text-brand">whole project</span> around it.
+            Keep every coding thread{' '}
+            <span className="text-brand">within reach</span>.
             <span
               aria-hidden
               className="ml-[5px] inline-block h-[1.05em] w-[7px] animate-caret rounded-[1px] bg-brand align-[-0.15em] motion-reduce:animate-none"
             />
           </p>
           <p className="mt-3.5 text-muted-foreground">
-            A native macOS workspace built around the terminal — projects, tabs,
-            browser panes, files, diffs, and git in one window.
+            A native macOS workspace for supervising agents and shipping their work.
+            Spaces keep related terminals, repositories, files, diffs, and browser tabs
+            together — without turning the terminal into a side panel.
             <br />
             Free, no telemetry, no subscription.
           </p>
@@ -307,13 +303,13 @@ function Home() {
       <figure className="m-0 flex flex-col gap-2">
         <img
           src="/sora-screenshot.png"
-          alt="Sora showing a project terminal with the process and port inspector open"
+          alt="Sora showing a terminal beside its process and port inspector"
           width={2286}
           height={1568}
           className="block w-full rounded-lg border border-border bg-card"
         />
         <figcaption className="text-[13px] text-muted-foreground">
-          Projects, grouped tabs, and the right-side panels beside the terminal
+          The terminal stays primary while project state remains close and inspectable
         </figcaption>
       </figure>
 
@@ -333,17 +329,6 @@ function Home() {
             </div>
           ))}
         </div>
-      </section>
-
-      <section className="flex flex-col gap-3.5">
-        <SectionHeading>Connect an AI agent</SectionHeading>
-        <p className="text-muted-foreground">
-          Save this as <code>.mcp.json</code>. Your MCP client launches the silent stdio server;
-          Pi uses the bundled CLI directly.
-        </p>
-        <CopyCommand command={MCP_CONFIG} wrap />
-        <p className="text-[13px] text-muted-foreground">Or give your agent this:</p>
-        <CopyCommand command={AGENT_PROMPT} wrap />
       </section>
 
       <section className="flex flex-col gap-3.5">
@@ -386,11 +371,8 @@ function SectionHeading({ children }: { children: ReactNode }) {
   )
 }
 
-/**
- * A copyable command or wrapped prompt. Text stays selectable when the
- * Clipboard API is unavailable (insecure context or denied permission).
- */
-function CopyCommand({ command, wrap = false }: { command: string; wrap?: boolean }) {
+/** Text stays selectable when the Clipboard API is unavailable. */
+function CopyCommand({ command }: { command: string }) {
   const [copied, setCopied] = useState(false)
   const commandRef = useRef<HTMLSpanElement>(null)
 
@@ -418,40 +400,22 @@ function CopyCommand({ command, wrap = false }: { command: string; wrap?: boolea
   }
 
   return (
-    <div
-      className={cn(
-        'flex max-w-full items-stretch self-start overflow-hidden rounded-[9px] border border-border bg-card',
-        wrap && 'w-full flex-col',
-      )}
-    >
-      <code
-        className={cn(
-          'flex min-w-0 gap-2 px-4 py-[7px]',
-          wrap ? 'whitespace-pre-wrap' : 'items-center overflow-x-auto whitespace-pre',
-        )}
-      >
-        {!wrap && (
-          <span aria-hidden className="shrink-0 text-muted-foreground select-none">
-            $
-          </span>
-        )}
+    <div className="flex max-w-full items-stretch self-start overflow-hidden rounded-[9px] border border-border bg-card">
+      <code className="flex min-w-0 items-center gap-2 overflow-x-auto px-4 py-[7px] whitespace-pre">
+        <span aria-hidden className="shrink-0 text-muted-foreground select-none">
+          $
+        </span>
         <span ref={commandRef}>{command}</span>
       </code>
       <button
         type="button"
         onClick={copy}
         aria-label={`Copy "${command}" to the clipboard`}
-        className={cn(
-          'inline-flex shrink-0 items-center justify-center gap-2 px-3.5 py-2 text-muted-foreground transition-colors hover:bg-brand/8 hover:text-brand',
-          wrap ? 'border-t border-border' : 'border-l border-border',
-        )}
+        className="inline-flex shrink-0 items-center justify-center gap-2 border-l border-border px-3.5 py-2 text-muted-foreground transition-colors hover:bg-brand/8 hover:text-brand"
       >
         <span
           aria-hidden
-          className={cn(
-            'size-4 shrink-0',
-            copied ? 'i-mingcute-check-line' : 'i-mingcute-copy-2-line',
-          )}
+          className={`size-4 shrink-0 ${copied ? 'i-mingcute-check-line' : 'i-mingcute-copy-2-line'}`}
         />
         <span aria-live="polite" className="max-[420px]:sr-only">
           {copied ? 'Copied' : 'Copy'}
