@@ -13,9 +13,9 @@ Once set up, cutting a release is one command:
 bun scripts/release.ts        # or: bun run release
 ```
 
-- Updater code: [`kero/Updater.swift`](kero/Updater.swift) — **Check for Updates…**
+- Updater code: [`Sora/Updater.swift`](Sora/Updater.swift) — **Check for Updates…**
   (app menu) and the **Updates** section in Settings.
-- Feed URL + public key: [`kero/Info.plist`](kero/Info.plist)
+- Feed URL + public key: [`Sora/Info.plist`](Sora/Info.plist)
   (`SUFeedURL`, `SUPublicEDKey`).
 - Release automation (Bun + TypeScript): [`scripts/release.ts`](scripts/release.ts),
   [`scripts/generate-appcast.ts`](scripts/generate-appcast.ts),
@@ -43,7 +43,7 @@ then:
 ./bin/generate_keys
 ```
 
-Copy the printed public key into [`kero/Info.plist`](kero/Info.plist), replacing
+Copy the printed public key into [`Sora/Info.plist`](Sora/Info.plist), replacing
 the placeholder `SUPublicEDKey` (it decodes to `REPLACE-ME-WITH-REAL-SPARKLE-KEY`,
 so it's obvious if you forget). Back the private key up somewhere safe:
 
@@ -114,7 +114,7 @@ Verify with `rclone lsf r2:kero-releases --s3-no-check-bucket`.
 
 ## Cutting a release
 
-1. **Bump the version** in the `kero` target's build settings:
+1. **Bump the version** in the `sora` target's build settings:
    - `MARKETING_VERSION` — user-visible, e.g. `1.1` (`CFBundleShortVersionString`).
    - `CURRENT_PROJECT_VERSION` — build number, e.g. `2` (`CFBundleVersion`).
      **Must increase every release** — Sparkle compares it to decide what's newer.
@@ -201,7 +201,7 @@ deployment target, edit that stanza in the tap by hand.
   Cloudflare redirect from e.g. `/download` to the newest `.dmg`.
 - **Automatic checks:** by default Sparkle asks the user once whether to allow
   automatic update checks. To opt in by default (no prompt), add to
-  [`kero/Info.plist`](kero/Info.plist):
+  [`Sora/Info.plist`](Sora/Info.plist):
   ```xml
   <key>SUEnableAutomaticChecks</key>
   <true/>

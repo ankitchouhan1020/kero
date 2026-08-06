@@ -27,6 +27,37 @@ struct SoraMCP {
         let arguments = parameters.arguments ?? [:]
         do {
             switch parameters.name {
+            case "sora_list_spaces":
+                return try result(client.send(.listSpaces))
+            case "sora_create_space":
+                guard let name = arguments["name"]?.stringValue else {
+                    return failure(.invalidRequest, "name is required")
+                }
+                let values = arguments["repositories"]?.arrayValue ?? []
+                let repositories = values.compactMap(\.stringValue)
+                guard repositories.count == values.count else {
+                    return failure(.invalidRequest, "repositories must contain only paths")
+                }
+                return try result(client.send(.createSpace(
+                    name: name,
+                    icon: arguments["icon"]?.stringValue,
+                    repositories: repositories.map(absolutePath)
+                )))
+            case "sora_select_space":
+                guard let id = uuid(arguments, "space_id") else {
+                    return failure(.invalidRequest, "space_id is required")
+                }
+                return try result(client.send(.selectSpace(id: id)))
+            case "sora_rename_space":
+                guard let id = uuid(arguments, "space_id"),
+                      let name = arguments["name"]?.stringValue
+                else { return failure(.invalidRequest, "space_id and name are required") }
+                return try result(client.send(.renameSpace(id: id, name: name)))
+            case "sora_remove_space":
+                guard let id = uuid(arguments, "space_id"),
+                      arguments["confirmed"]?.boolValue == true
+                else { return failure(.invalidRequest, "space_id and confirmed=true are required") }
+                return try result(client.send(.removeSpace(id: id, confirmed: true)))
             case "sora_list_projects":
                 return try result(client.send(.listProjects))
             case "sora_open_project":
@@ -37,11 +68,12 @@ struct SoraMCP {
                     path: absolutePath(path), name: arguments["name"]?.stringValue
                 )))
             case "sora_spawn_terminal":
-                guard let project = arguments["project"]?.stringValue else {
-                    return failure(.invalidRequest, "project is required")
+                guard let space = arguments["space"]?.stringValue
+                    ?? arguments["project"]?.stringValue else {
+                    return failure(.invalidRequest, "space is required")
                 }
-                return try result(client.send(.spawnTerminal(
-                    project: projectReference(project),
+                return try result(client.send(.spawnTerminalInSpace(
+                    space: spaceReference(space),
                     command: arguments["command"]?.stringValue,
                     name: arguments["name"]?.stringValue
                 )))
@@ -78,6 +110,10 @@ struct SoraMCP {
     private static func result(_ result: SoraAutomationResult) throws -> CallTool.Result {
         let value: Value
         switch result {
+        case .spaces(let spaces):
+            value = .object(["spaces": .array(spaces.map(spaceValue))])
+        case .space(let space):
+            value = .object(["space": spaceValue(space)])
         case .projects(let projects):
             value = .object(["projects": .array(projects.map(projectValue))])
         case .project(let project):
@@ -109,6 +145,17 @@ struct SoraMCP {
         )
     }
 
+    private static func spaceValue(_ space: SoraSpaceSummary) -> Value {
+        .object([
+            "id": .string(space.id.uuidString),
+            "window_id": .string(space.windowID.uuidString),
+            "name": .string(space.name),
+            "icon": space.icon.map(Value.string) ?? .null,
+            "repositories": .array(space.repositories.map(Value.string)),
+            "selected": .bool(space.selected),
+        ])
+    }
+
     private static func projectValue(_ project: SoraProjectSummary) -> Value {
         .object([
             "id": .string(project.id.uuidString),
@@ -121,6 +168,7 @@ struct SoraMCP {
     private static func terminalValue(_ terminal: SoraTerminalSummary) -> Value {
         .object([
             "id": .string(terminal.id.uuidString),
+            "space_id": .string(terminal.spaceID.uuidString),
             "project_id": .string(terminal.projectID.uuidString),
             "name": .string(terminal.name),
             "directory": .string(terminal.directory),
@@ -130,6 +178,11 @@ struct SoraMCP {
 
     private static func uuid(_ arguments: [String: Value], _ key: String) -> UUID? {
         arguments[key]?.stringValue.flatMap(UUID.init(uuidString:))
+    }
+
+    private static func spaceReference(_ value: String) -> SoraSpaceReference {
+        UUID(uuidString: value).map(SoraSpaceReference.id)
+            ?? .path(absolutePath(value))
     }
 
     private static func projectReference(_ value: String) -> SoraProjectReference {
@@ -148,16 +201,41 @@ struct SoraMCP {
     }
 
     private static let tools: [Tool] = [
-        tool("sora_list_projects", "List projects open in Sora"),
+        tool("sora_list_spaces", "List Spaces open in Sora"),
+        tool("sora_create_space", "Create a Sora Space", properties: [
+            "name": string("Space name"),
+            "icon": string("Optional emoji or SF Symbol name"),
+            "repositories": .object([
+                "type": "array",
+                "description": "Git repository paths attached to the Space",
+                "items": .object(["type": "string"]),
+            ]),
+        ], required: ["name"]),
+        tool("sora_select_space", "Select a Sora Space", properties: [
+            "space_id": string("Space UUID"),
+        ], required: ["space_id"]),
+        tool("sora_rename_space", "Rename a Sora Space", properties: [
+            "space_id": string("Space UUID"),
+            "name": string("New Space name"),
+        ], required: ["space_id", "name"]),
+        tool("sora_remove_space", "Permanently remove a Sora Space", properties: [
+            "space_id": string("Space UUID"),
+            "confirmed": .object([
+                "type": "boolean",
+                "description": "Must be true; removal closes terminals and loses unsaved edits",
+            ]),
+        ], required: ["space_id", "confirmed"]),
+        tool("sora_list_projects", "Legacy alias: list projects open in Sora"),
         tool("sora_open_project", "Open or select a project directory in Sora", properties: [
             "path": string("Absolute or relative directory path"),
             "name": string("Optional project name"),
         ], required: ["path"]),
-        tool("sora_spawn_terminal", "Open a visible terminal tab in a Sora project", properties: [
-            "project": string("Project UUID or directory path"),
+        tool("sora_spawn_terminal", "Open a visible terminal tab in a Sora Space", properties: [
+            "space": string("Space UUID or repository path"),
+            "project": string("Legacy alias for space"),
             "command": string("Optional shell command to run"),
             "name": string("Optional terminal tab name"),
-        ], required: ["project"]),
+        ]),
         tool("sora_send_input", "Send text to a live Sora terminal", properties: [
             "terminal_id": string("Terminal UUID"),
             "text": string("Text to send"),

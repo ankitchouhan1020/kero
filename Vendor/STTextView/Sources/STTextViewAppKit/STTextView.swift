@@ -1440,7 +1440,7 @@ open class STTextView: NSView, NSTextInput, NSTextContent, STTextViewProtocol {
             usageBoundsForTextContainerSize.width = max(usageBoundsForTextContainerSize.width, layoutFragment.layoutFragmentFrame.size.width)
             return false
         }
-        // kero patch: the reverse enumeration above visits only the final
+        // sora patch: the reverse enumeration above visits only the final
         // layout fragment. A shorter final line must not hide wider lines
         // from the scroll view's document width.
         usageBoundsForTextContainerSize.width = max(
@@ -1527,7 +1527,7 @@ open class STTextView: NSView, NSTextInput, NSTextContent, STTextViewProtocol {
             estimatedSize.width = max(estimatedSize.width, layoutFragment.layoutFragmentFrame.size.width)
             return false
         }
-        // kero patch: the final fragment is not necessarily the widest one.
+        // sora patch: the final fragment is not necessarily the widest one.
         // Preserve the widest laid-out line so NSScrollView has a horizontal
         // range whenever no-wrap content extends beyond the viewport.
         estimatedSize.width = max(
@@ -1560,7 +1560,7 @@ open class STTextView: NSView, NSTextInput, NSTextContent, STTextViewProtocol {
 
         if let scrollView {
             estimatedSize.width = max(estimatedSize.width, scrollView.contentView.bounds.width - scrollerInset)
-            // kero patch: a document shorter than the viewport must still fill
+            // sora patch: a document shorter than the viewport must still fill
             // it, the way the width above fills a narrow one. Otherwise the
             // region below the last line belongs to the clip view, where clicks
             // never reach the text view — so they neither focus the editor nor

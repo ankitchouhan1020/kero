@@ -17,6 +17,14 @@ nonisolated enum SoraAutomationEndpoint {
 }
 
 nonisolated enum SoraAutomationRequest: Codable, Equatable {
+    case listSpaces
+    case createSpace(name: String, icon: String?, repositories: [String])
+    case selectSpace(id: UUID)
+    case renameSpace(id: UUID, name: String)
+    case removeSpace(id: UUID, confirmed: Bool)
+    case spawnTerminalInSpace(space: SoraSpaceReference, command: String?, name: String?)
+
+    // Compatibility for clients built before Projects became Spaces.
     case listProjects
     case openProject(path: String, name: String?)
     case selectProject(id: UUID)
@@ -24,6 +32,14 @@ nonisolated enum SoraAutomationRequest: Codable, Equatable {
     case sendInput(terminalID: UUID, text: String, submit: Bool)
     case readOutput(terminalID: UUID, lines: Int)
     case closeTerminal(id: UUID)
+}
+
+nonisolated struct SoraSpaceReference: Codable, Equatable {
+    var id: UUID?
+    var path: String?
+
+    static func id(_ id: UUID) -> Self { Self(id: id, path: nil) }
+    static func path(_ path: String) -> Self { Self(id: nil, path: path) }
 }
 
 nonisolated struct SoraProjectReference: Codable, Equatable {
@@ -40,11 +56,22 @@ nonisolated enum SoraAutomationResponse: Codable, Equatable {
 }
 
 nonisolated enum SoraAutomationResult: Codable, Equatable {
+    case spaces([SoraSpaceSummary])
+    case space(SoraSpaceSummary)
     case projects([SoraProjectSummary])
     case project(SoraProjectSummary)
     case terminal(SoraTerminalSummary)
     case output(String)
     case acknowledged
+}
+
+nonisolated struct SoraSpaceSummary: Codable, Equatable {
+    var id: UUID
+    var windowID: UUID
+    var name: String
+    var icon: String?
+    var repositories: [String]
+    var selected: Bool
 }
 
 nonisolated struct SoraProjectSummary: Codable, Equatable {
@@ -58,6 +85,7 @@ nonisolated struct SoraProjectSummary: Codable, Equatable {
 nonisolated struct SoraTerminalSummary: Codable, Equatable {
     var id: UUID
     var projectID: UUID
+    var spaceID: UUID { projectID }
     var name: String
     var directory: String
     var exited: Bool
@@ -68,6 +96,7 @@ nonisolated struct SoraAutomationFailure: Error, Codable, Equatable {
         case automationDisabled
         case invalidRequest
         case invalidPath
+        case spaceNotFound
         case projectNotFound
         case terminalNotFound
         case terminalExited

@@ -175,9 +175,11 @@ private enum SoraCLI {
             try await SoraMCP.run(client: client)
         case "status":
             guard arguments.count == 1 else { throw CLIError.usage("Usage: sora status") }
-            let result = try client.send(.listProjects, launchIfNeeded: false)
-            guard case .projects(let projects) = result else { throw CLIError.transport("Unexpected response") }
-            print("Sora is running; local automation enabled; \(projects.count) project(s)")
+            let result = try client.send(.listSpaces, launchIfNeeded: false)
+            guard case .spaces(let spaces) = result else { throw CLIError.transport("Unexpected response") }
+            print("Sora is running; local automation enabled; \(spaces.count) Space(s)")
+        case "space":
+            try runSpaceCommand(Array(arguments.dropFirst()), client: client)
         case "project":
             guard arguments == ["project", "list"] else {
                 throw CLIError.usage("Usage: sora project list")
@@ -215,8 +217,8 @@ private enum SoraCLI {
             print(output)
         case "run":
             let parsed = try parseRun(Array(arguments.dropFirst()))
-            guard case .terminal(let terminal) = try client.send(.spawnTerminal(
-                project: parsed.project, command: parsed.command, name: parsed.name
+            guard case .terminal(let terminal) = try client.send(.spawnTerminalInSpace(
+                space: parsed.space, command: parsed.command, name: parsed.name
             )) else { throw CLIError.transport("Unexpected response") }
             print("\(terminal.id.uuidString)\t\(terminal.name)\t\(terminal.directory)")
         case "help", "--help", "-h":
@@ -226,28 +228,83 @@ private enum SoraCLI {
         }
     }
 
+    private static func runSpaceCommand(_ arguments: [String], client: SoraClient) throws {
+        guard let command = arguments.first else { throw CLIError.usage(spaceUsage) }
+        switch command {
+        case "list":
+            guard arguments.count == 1,
+                  case .spaces(let spaces) = try client.send(.listSpaces)
+            else { throw CLIError.usage(spaceUsage) }
+            for space in spaces {
+                print("\(space.id.uuidString)\t\(space.name)\t\(space.icon ?? "")\t\(space.repositories.joined(separator: ","))")
+            }
+        case "create":
+            var name: String?
+            var icon: String?
+            var repositories: [String] = []
+            var index = 1
+            while index < arguments.count {
+                guard index + 1 < arguments.count else { throw CLIError.usage(spaceUsage) }
+                switch arguments[index] {
+                case "--name": name = arguments[index + 1]
+                case "--icon": icon = arguments[index + 1]
+                case "--repository", "--repo":
+                    repositories.append(absolutePath(arguments[index + 1]))
+                default: throw CLIError.usage(spaceUsage)
+                }
+                index += 2
+            }
+            guard let name,
+                  case .space(let space) = try client.send(.createSpace(
+                    name: name, icon: icon, repositories: repositories
+                  ))
+            else { throw CLIError.usage(spaceUsage) }
+            print("\(space.id.uuidString)\t\(space.name)")
+        case "select":
+            guard arguments.count == 2, let id = UUID(uuidString: arguments[1]),
+                  case .space(let space) = try client.send(.selectSpace(id: id))
+            else { throw CLIError.usage(spaceUsage) }
+            print("\(space.id.uuidString)\t\(space.name)")
+        case "rename":
+            guard arguments.count == 3, let id = UUID(uuidString: arguments[1]),
+                  case .space(let space) = try client.send(.renameSpace(
+                    id: id, name: arguments[2]
+                  ))
+            else { throw CLIError.usage(spaceUsage) }
+            print("\(space.id.uuidString)\t\(space.name)")
+        case "remove":
+            guard arguments.count == 3, let id = UUID(uuidString: arguments[1]),
+                  arguments[2] == "--force"
+            else { throw CLIError.usage("Usage: sora space remove <id> --force") }
+            guard case .acknowledged = try client.send(.removeSpace(id: id, confirmed: true))
+            else { throw CLIError.transport("Unexpected response") }
+        default:
+            throw CLIError.usage(spaceUsage)
+        }
+    }
+
     private static func parseRun(
         _ arguments: [String]
-    ) throws -> (project: SoraProjectReference, name: String?, command: String) {
-        var project: SoraProjectReference?
+    ) throws -> (space: SoraSpaceReference, name: String?, command: String) {
+        var space: SoraSpaceReference?
         var name: String?
         var index = 0
         while index < arguments.count, arguments[index] != "--" {
             guard index + 1 < arguments.count else { throw CLIError.usage("Usage: \(runUsage)") }
             switch arguments[index] {
-            case "--project":
+            case "--space", "--project":
                 let value = arguments[index + 1]
-                project = UUID(uuidString: value).map(SoraProjectReference.id)
+                space = UUID(uuidString: value).map(SoraSpaceReference.id)
                     ?? .path(absolutePath(value))
             case "--name": name = arguments[index + 1]
             default: throw CLIError.usage("Usage: \(runUsage)")
             }
             index += 2
         }
-        guard let project, index < arguments.count, arguments[index] == "--",
+        guard let space, index < arguments.count, arguments[index] == "--",
               index + 1 < arguments.count else { throw CLIError.usage("Usage: \(runUsage)") }
         let command = arguments[(index + 1)...].map(shellQuote).joined(separator: " ")
-        return (project, name, command)
+        return (space, name, command)
     }
 
     private static func absolutePath(_ path: String) -> String {
@@ -258,12 +315,24 @@ private enum SoraCLI {
         "'" + argument.replacingOccurrences(of: "'", with: "'\\''") + "'"
     }
 
-    private static let runUsage = "sora run --project <id-or-path> [--name <name>] -- <command> [arguments…]"
+    private static let runUsage = "sora run --space <id-or-path> [--name <name>] -- <command> [arguments…]"
+    private static let spaceUsage = """
+    Usage:
+      sora space list
+      sora space create --name <name> [--icon <symbol>] [--repository <path>]…
+      sora space select <id>
+      sora space rename <id> <name>
+      sora space remove <id> --force
+    """
     private static let usage = """
     Usage:
       sora mcp
       sora status
-      sora project list
+      sora space list
+      sora space create --name <name> [--icon <symbol>] [--repository <path>]…
+      sora space select <id>
+      sora space rename <id> <name>
+      sora space remove <id> --force
       sora open <path>
       sora send <terminal-id> <text> [--submit]
       sora output <terminal-id> [--lines <count>]

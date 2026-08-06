@@ -16,6 +16,13 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unrelease]
 
+## [0.3.0]
+
+- Organize work in Spaces with vertical pinned and temporary tabs, attached repositories, custom icons, and trackpad switching.
+- Rename tabs directly from the left sidebar.
+- Collapse every expanded folder in the file viewer with one click.
+- The `sora` CLI and MCP server now manage Spaces directly, including creating, selecting, renaming, removing, and opening terminals within them.
+
 ## [0.2.3]
 
 - Command-click terminal links to reveal local files in Finder, or open files and websites directly in new Sora tabs and panes.

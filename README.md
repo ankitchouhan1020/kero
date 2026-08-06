@@ -10,9 +10,22 @@ A native terminal workspace for macOS.
 - Native design
 - Split panes
 - Git intergration
-- Group by projects
+- Organize work into Spaces
 - File tree
-- Local automation through the bundled `sora` CLI and MCP server
+- Local automation through the bundled `sora` CLI and MCP server, including Space creation, selection, renaming, removal, and terminal spawning
+
+## CLI
+
+```sh
+sora space list
+sora space create --name "Ship auth" --repository ~/Code/app
+sora space select <space-id>
+sora space rename <space-id> "Review auth"
+sora run --space <space-id> -- npm test
+sora space remove <space-id> --force
+```
+
+The same Space operations are available through `sora mcp`.
 
 ## Download
 

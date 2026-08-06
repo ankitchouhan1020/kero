@@ -1,0 +1,676 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA10000000000000000000B2 /* GhosttyTerminal in Frameworks */ = {isa = PBXBuildFile; productRef = AA10000000000000000000B1 /* GhosttyTerminal */; };
+		AA10000000000000000000B4 /* GhosttyTheme in Frameworks */ = {isa = PBXBuildFile; productRef = AA10000000000000000000B3 /* GhosttyTheme */; };
+		AA10000000000000000000C2 /* STTextView in Frameworks */ = {isa = PBXBuildFile; productRef = AA10000000000000000000C1 /* STTextView */; };
+		AA10000000000000000000E2 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA10000000000000000000E1 /* Sparkle */; };
+		AA20000000000000000000A2 /* STTextView-Plugin-Neon in Frameworks */ = {isa = PBXBuildFile; productRef = AA20000000000000000000A1 /* STTextView-Plugin-Neon */; };
+		AA30000000000000000000A2 /* TreeSitterTSX in Frameworks */ = {isa = PBXBuildFile; productRef = AA30000000000000000000A1 /* TreeSitterTSX */; };
+		FF519F43300BBE2100D8B982 /* PierreDiffsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA10000000000000000000D1 /* PierreDiffsSwift */; };
+		BB0000000000000000000020 /* SoraCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000002 /* SoraCLI.swift */; };
+		BB0000000000000000000021 /* SoraAutomationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000003 /* SoraAutomationProtocol.swift */; };
+		BB0000000000000000000022 /* SoraAutomationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000003 /* SoraAutomationProtocol.swift */; };
+		BB0000000000000000000023 /* sora in Embed Helper */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000001 /* sora */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BB0000000000000000000024 /* SoraMCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000004 /* SoraMCP.swift */; };
+		BB0000000000000000000025 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = BB00000000000000000000F1 /* MCP */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA50000000000000000000A0 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		AA50000000000000000000A1 /* Local.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.example.xcconfig; sourceTree = "<group>"; };
+		FF3FDD73300B6A7400112486 /* Sora Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sora Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0000000000000000000001 /* sora */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sora; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0000000000000000000002 /* SoraCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoraCLI.swift; sourceTree = "<group>"; };
+		BB0000000000000000000003 /* SoraAutomationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoraAutomationProtocol.swift; sourceTree = "<group>"; };
+		BB0000000000000000000004 /* SoraMCP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoraMCP.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA10000000000000000000F0 /* Exceptions for "Sora" folder in "Sora" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FF3FDD72300B6A7400112486 /* Sora */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		FF3FDD75300B6A7400112486 /* Sora */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA10000000000000000000F0 /* Exceptions for "Sora" folder in "Sora" target */,
+			);
+			path = Sora;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		BB0000000000000000000060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF3FDD6B300B6A7400112486 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB0000000000000000000040;
+			remoteInfo = "sora-cli";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BB0000000000000000000032 /* Embed Helper */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Helpers;
+			dstSubfolderSpec = 1;
+			files = (
+				BB0000000000000000000023 /* sora in Embed Helper */,
+			);
+			name = "Embed Helper";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BB0000000000000000000031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB0000000000000000000025 /* MCP in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF3FDD70300B6A7400112486 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				FF519F43300BBE2100D8B982 /* PierreDiffsSwift in Frameworks */,
+				AA10000000000000000000B2 /* GhosttyTerminal in Frameworks */,
+				AA10000000000000000000B4 /* GhosttyTheme in Frameworks */,
+				AA10000000000000000000C2 /* STTextView in Frameworks */,
+				AA10000000000000000000E2 /* Sparkle in Frameworks */,
+				AA20000000000000000000A2 /* STTextView-Plugin-Neon in Frameworks */,
+				AA30000000000000000000A2 /* TreeSitterTSX in Frameworks */,
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA50000000000000000000A2 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				AA50000000000000000000A0 /* Debug.xcconfig */,
+				AA50000000000000000000A1 /* Local.example.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		FF3FDD6A300B6A7400112486 = {
+			isa = PBXGroup;
+			children = (
+				AA50000000000000000000A2 /* Config */,
+				FF3FDD75300B6A7400112486 /* Sora */,
+				BB0000000000000000000010 /* sora-cli */,
+				BB0000000000000000000011 /* Shared */,
+				FF3FDD74300B6A7400112486 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BB0000000000000000000010 /* sora-cli */ = {
+			isa = PBXGroup;
+			children = (
+				BB0000000000000000000002 /* SoraCLI.swift */,
+				BB0000000000000000000004 /* SoraMCP.swift */,
+			);
+			path = "sora-cli";
+			sourceTree = "<group>";
+		};
+		BB0000000000000000000011 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				BB0000000000000000000003 /* SoraAutomationProtocol.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		FF3FDD74300B6A7400112486 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF3FDD73300B6A7400112486 /* Sora Debug.app */,
+				BB0000000000000000000001 /* sora */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BB0000000000000000000040 /* sora-cli */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB0000000000000000000052 /* Build configuration list for PBXNativeTarget "sora-cli" */;
+			buildPhases = (
+				BB0000000000000000000030 /* Sources */,
+				BB0000000000000000000031 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "sora-cli";
+			packageProductDependencies = (
+				BB00000000000000000000F1 /* MCP */,
+			);
+			productName = sora;
+			productReference = BB0000000000000000000001 /* sora */;
+			productType = "com.apple.product-type.tool";
+		};
+		FF3FDD72300B6A7400112486 /* Sora */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF3FDD7E300B6A7600112486 /* Build configuration list for PBXNativeTarget "Sora" */;
+			buildPhases = (
+				AA40000000000000000000A0 /* Build Alacritty bridge */,
+				FF3FDD6F300B6A7400112486 /* Sources */,
+				FF3FDD70300B6A7400112486 /* Frameworks */,
+				FF3FDD71300B6A7400112486 /* Resources */,
+				BB0000000000000000000032 /* Embed Helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BB0000000000000000000061 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FF3FDD75300B6A7400112486 /* Sora */,
+			);
+			name = Sora;
+			packageProductDependencies = (
+				AA10000000000000000000B1 /* GhosttyTerminal */,
+				AA10000000000000000000B3 /* GhosttyTheme */,
+				AA10000000000000000000C1 /* STTextView */,
+				AA10000000000000000000D1 /* PierreDiffsSwift */,
+				AA10000000000000000000E1 /* Sparkle */,
+				AA20000000000000000000A1 /* STTextView-Plugin-Neon */,
+				AA30000000000000000000A1 /* TreeSitterTSX */,
+			);
+			productName = Sora;
+			productReference = FF3FDD73300B6A7400112486 /* Sora Debug.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF3FDD6B300B6A7400112486 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					BB0000000000000000000040 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					FF3FDD72300B6A7400112486 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = FF3FDD6E300B6A7400112486 /* Build configuration list for PBXProject "Sora" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF3FDD6A300B6A7400112486;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AA10000000000000000000C0 /* XCLocalSwiftPackageReference "Vendor/STTextView" */,
+				AA10000000000000000000B0 /* XCLocalSwiftPackageReference "Vendor/libghostty-spm" */,
+				AA30000000000000000000A0 /* XCLocalSwiftPackageReference "Vendor/TreeSitterTSX" */,
+				AA10000000000000000000D0 /* XCRemoteSwiftPackageReference "PierreDiffsSwift" */,
+				AA10000000000000000000E0 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				AA20000000000000000000A0 /* XCRemoteSwiftPackageReference "STTextView-Plugin-Neon" */,
+				BB00000000000000000000F0 /* XCRemoteSwiftPackageReference "swift-sdk" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FF3FDD74300B6A7400112486 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF3FDD72300B6A7400112486 /* Sora */,
+				BB0000000000000000000040 /* sora-cli */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FF3FDD71300B6A7400112486 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AA40000000000000000000A0 /* Build Alacritty bridge */ = {
+			isa = PBXShellScriptBuildPhase;
+			inputPaths = (
+				"$(SRCROOT)/Vendor/alacritty-bridge/Cargo.lock",
+				"$(SRCROOT)/Vendor/alacritty-bridge/Cargo.toml",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/graphics_event_loop.rs",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/kitty_graphics.rs",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/kitty_graphics_tracking.rs",
+				"$(SRCROOT)/Vendor/alacritty-bridge/src/lib.rs",
+				"$(SRCROOT)/scripts/build-alacritty-bridge.sh",
+			);
+			name = "Build Alacritty bridge";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/alacritty-bridge/libsora_alacritty.a",
+			);
+			shellPath = /bin/zsh;
+			shellScript = (
+				"\"${SRCROOT}/scripts/build-alacritty-bridge.sh\"",
+				"",
+			);
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BB0000000000000000000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB0000000000000000000020 /* SoraCLI.swift in Sources */,
+				BB0000000000000000000021 /* SoraAutomationProtocol.swift in Sources */,
+				BB0000000000000000000024 /* SoraMCP.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF3FDD6F300B6A7400112486 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				BB0000000000000000000022 /* SoraAutomationProtocol.swift in Sources */,
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FF3FDD7C300B6A7600112486 /* Debug configuration for PBXProject "Sora" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FF3FDD7D300B6A7600112486 /* Release configuration for PBXProject "Sora" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		BB0000000000000000000050 /* Debug configuration for PBXNativeTarget "sora-cli" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 42;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 0.3.0;
+				OTHER_CODE_SIGN_FLAGS = "--identifier $(PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev.helper;
+				PRODUCT_NAME = sora;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BB0000000000000000000051 /* Release configuration for PBXNativeTarget "sora-cli" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 42;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 0.3.0;
+				OTHER_CODE_SIGN_FLAGS = "--identifier $(PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.helper;
+				PRODUCT_NAME = sora;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FF3FDD7F300B6A7600112486 /* Debug configuration for PBXNativeTarget "Sora" */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA50000000000000000000A0 /* Debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Dev";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Sora/Sora.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 42;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/alacritty-bridge/include",
+				);
+				INFOPLIST_FILE = Sora/Info.plist;
+				SORA_DISPLAY_NAME = "Sora Debug";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)/alacritty-bridge",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 0.3.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lsora_alacritty",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora.dev;
+				PRODUCT_NAME = "Sora Debug";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Sora/Sora-Bridging-Header.h";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_NAME = "$(SORA_DISPLAY_NAME).app";
+			};
+			name = Debug;
+		};
+		FF3FDD80300B6A7600112486 /* Release configuration for PBXNativeTarget "Sora" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Sora/Sora.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 42;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/alacritty-bridge/include",
+				);
+				INFOPLIST_FILE = Sora/Info.plist;
+				SORA_DISPLAY_NAME = Sora;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)/alacritty-bridge",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 0.3.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lsora_alacritty",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ankitchouhan.sora;
+				PRODUCT_NAME = Sora;
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Sora/Sora-Bridging-Header.h";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_NAME = "$(SORA_DISPLAY_NAME).app";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF3FDD6E300B6A7400112486 /* Build configuration list for PBXProject "Sora" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF3FDD7C300B6A7600112486 /* Debug configuration for PBXProject "Sora" */,
+				FF3FDD7D300B6A7600112486 /* Release configuration for PBXProject "Sora" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		BB0000000000000000000052 /* Build configuration list for PBXNativeTarget "sora-cli" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB0000000000000000000050 /* Debug configuration for PBXNativeTarget "sora-cli" */,
+				BB0000000000000000000051 /* Release configuration for PBXNativeTarget "sora-cli" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		FF3FDD7E300B6A7600112486 /* Build configuration list for PBXNativeTarget "sora" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF3FDD7F300B6A7600112486 /* Debug configuration for PBXNativeTarget "Sora" */,
+				FF3FDD80300B6A7600112486 /* Release configuration for PBXNativeTarget "Sora" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin PBXTargetDependency section */
+		BB0000000000000000000061 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB0000000000000000000040 /* sora-cli */;
+			targetProxy = BB0000000000000000000060 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		AA10000000000000000000B0 /* XCLocalSwiftPackageReference "Vendor/libghostty-spm" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "Vendor/libghostty-spm";
+		};
+		AA10000000000000000000C0 /* XCLocalSwiftPackageReference "Vendor/STTextView" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/STTextView;
+		};
+		AA30000000000000000000A0 /* XCLocalSwiftPackageReference "Vendor/TreeSitterTSX" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/TreeSitterTSX;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA10000000000000000000D0 /* XCRemoteSwiftPackageReference "PierreDiffsSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/egoist-labs/PierreDiffsSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.1;
+			};
+		};
+		AA10000000000000000000E0 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.0;
+			};
+		};
+		AA20000000000000000000A0 /* XCRemoteSwiftPackageReference "STTextView-Plugin-Neon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/STTextView-Plugin-Neon";
+			requirement = {
+				kind = revision;
+				revision = 5a30db4ce7908a5414e7b499e2379bdc49991cd1;
+			};
+		};
+		BB00000000000000000000F0 /* XCRemoteSwiftPackageReference "swift-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/modelcontextprotocol/swift-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA10000000000000000000B1 /* GhosttyTerminal */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GhosttyTerminal;
+		};
+		AA10000000000000000000B3 /* GhosttyTheme */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GhosttyTheme;
+		};
+		AA10000000000000000000C1 /* STTextView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = STTextView;
+		};
+		AA10000000000000000000D1 /* PierreDiffsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA10000000000000000000D0 /* XCRemoteSwiftPackageReference "PierreDiffsSwift" */;
+			productName = PierreDiffsSwift;
+		};
+		AA10000000000000000000E1 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA10000000000000000000E0 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		AA20000000000000000000A1 /* STTextView-Plugin-Neon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA20000000000000000000A0 /* XCRemoteSwiftPackageReference "STTextView-Plugin-Neon" */;
+			productName = "STTextView-Plugin-Neon";
+		};
+		AA30000000000000000000A1 /* TreeSitterTSX */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TreeSitterTSX;
+		};
+		BB00000000000000000000F1 /* MCP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB00000000000000000000F0 /* XCRemoteSwiftPackageReference "swift-sdk" */;
+			productName = MCP;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = FF3FDD6B300B6A7400112486 /* Project object */;
+	validationLevel = 1;
+}

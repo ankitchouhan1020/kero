@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Builds the Rust static library behind Kero's Alacritty backend and stages a
+# Builds the Rust static library behind Sora's Alacritty backend and stages a
 # single archive at a stable path for the linker.
 #
 # Xcode runs this as a build phase ahead of Compile Sources. It builds one
@@ -16,7 +16,7 @@ set -euo pipefail
 
 CRATE_DIR="${SRCROOT}/Vendor/alacritty-bridge"
 OUTPUT_DIR="${BUILT_PRODUCTS_DIR}/alacritty-bridge"
-OUTPUT="${OUTPUT_DIR}/libkero_alacritty.a"
+OUTPUT="${OUTPUT_DIR}/libsora_alacritty.a"
 WORK_DIR="${TARGET_TEMP_DIR}/alacritty-bridge"
 BUILD_DIR="${WORK_DIR}/crate"
 
@@ -32,7 +32,7 @@ if ! command -v cargo > /dev/null 2>&1; then
 fi
 
 if ! command -v cargo > /dev/null 2>&1; then
-  echo "error: cargo not found. Kero's Alacritty backend needs a Rust toolchain — install it from https://rustup.rs and build again." >&2
+  echo "error: cargo not found. Sora's Alacritty backend needs a Rust toolchain — install it from https://rustup.rs and build again." >&2
   exit 1
 fi
 
@@ -61,13 +61,13 @@ for arch in ${=ARCHS}; do
   # Always release: this is a terminal renderer's hot path, and a debug build
   # of the VT parser is slow enough to feel while typing.
   cargo build --release --locked --manifest-path "${BUILD_DIR}/Cargo.toml" --target "${target}"
-  slices+=("${CARGO_TARGET_DIR}/${target}/release/libkero_alacritty.a")
+  slices+=("${CARGO_TARGET_DIR}/${target}/release/libsora_alacritty.a")
 done
 
 if [[ ${#slices[@]} -eq 1 ]]; then
   cp "${slices[1]}" "${OUTPUT}"
 else
-  tmp="${WORK_DIR}/libkero_alacritty.a"
+  tmp="${WORK_DIR}/libsora_alacritty.a"
   lipo -create "${slices[@]}" -output "${tmp}"
   cp "${tmp}" "${OUTPUT}"
 fi

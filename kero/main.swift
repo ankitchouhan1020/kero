@@ -1,3 +1,0 @@
-import SwiftUI
-
-keroApp.main()

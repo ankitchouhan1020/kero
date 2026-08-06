@@ -18,10 +18,10 @@ backend's bridge in `Vendor/alacritty-bridge` is a Rust static library, built
 from an Xcode build phase. Building for a second architecture needs its target
 installed too — `rustup target add x86_64-apple-darwin`.
 
-Open `kero.xcodeproj` and run the `kero` scheme, or:
+Open `Sora.xcodeproj` and run the `Sora` scheme, or:
 
 ```bash
-xcodebuild -project kero.xcodeproj -scheme kero -configuration Debug -destination 'platform=macOS,arch=arm64' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+xcodebuild -project Sora.xcodeproj -scheme Sora -configuration Debug -destination 'platform=macOS,arch=arm64' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 ```
 
 Add `DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer` if you only have Xcode beta.

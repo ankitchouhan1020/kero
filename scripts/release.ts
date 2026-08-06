@@ -41,12 +41,12 @@ if (unknownArg) die(`unknown option: ${unknownArg}`);
 const localBuild = args.includes("--local");
 
 // ---- config (override via env) -------------------------------------------
-const PROJECT = "kero.xcodeproj";
-const SCHEME = "kero";
+const PROJECT = "Sora.xcodeproj";
+const SCHEME = "Sora";
 const CONFIGURATION = process.env.CONFIGURATION ?? "Release";
 const BUILD_DIR = process.env.BUILD_DIR ?? "build";
 const UPDATES_DIR = join(BUILD_DIR, "updates");
-const ARCHIVE_PATH = join(BUILD_DIR, "kero.xcarchive");
+const ARCHIVE_PATH = join(BUILD_DIR, "Sora.xcarchive");
 const EXPORT_DIR = join(BUILD_DIR, "export");
 const EXPORT_OPTIONS = process.env.EXPORT_OPTIONS ?? "scripts/ExportOptions.plist";
 const NOTARY_PROFILE = process.env.NOTARY_PROFILE ?? "NOTARY";

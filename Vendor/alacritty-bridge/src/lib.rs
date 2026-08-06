@@ -1,4 +1,4 @@
-//! C ABI over `alacritty_terminal` for Kero's Alacritty backend.
+//! C ABI over `alacritty_terminal` for Sora's Alacritty backend.
 //!
 //! `alacritty_terminal` is emulation only — VT parser, grid, PTY, selection —
 //! with no renderer of any kind. This crate owns the terminal state and the
@@ -8,7 +8,7 @@
 //! size) is answered here rather than crossing the boundary twice.
 //!
 //! Threading: the PTY read loop runs on its own thread and mutates the
-//! terminal behind a `FairMutex`. Every `kero_alacritty_*` entry point takes
+//! terminal behind a `FairMutex`. Every `sora_alacritty_*` entry point takes
 //! that lock, so Swift may call them from the main thread while the loop runs.
 //! The snapshot buffer is owned by the handle and is only valid until the next
 //! call on that handle.
@@ -50,63 +50,63 @@ use kitty_graphics::{KittyGraphicsScreen, KittyGraphicsSize, KittyGraphicsStore}
 
 /// Event kinds pushed to Swift from the PTY thread. Swift bounces these onto
 /// the main thread before touching any view state.
-pub const KERO_EVENT_WAKEUP: u32 = 0;
-pub const KERO_EVENT_TITLE: u32 = 1;
-pub const KERO_EVENT_BELL: u32 = 2;
-pub const KERO_EVENT_EXIT: u32 = 3;
-pub const KERO_EVENT_CLIPBOARD_STORE: u32 = 4;
-pub const KERO_EVENT_CLIPBOARD_LOAD: u32 = 5;
-pub const KERO_EVENT_WORKING_DIRECTORY: u32 = 6;
-pub const KERO_EVENT_PROGRESS: u32 = 7;
-pub const KERO_EVENT_NOTIFICATION: u32 = 8;
-pub const KERO_EVENT_SHELL_PROMPT_START: u32 = 9;
-pub const KERO_EVENT_SHELL_COMMAND_START: u32 = 10;
-pub const KERO_EVENT_SHELL_COMMAND_EXECUTING: u32 = 11;
-pub const KERO_EVENT_SHELL_COMMAND_FINISHED: u32 = 12;
-pub const KERO_EVENT_MOUSE_SHAPE: u32 = 13;
+pub const SORA_EVENT_WAKEUP: u32 = 0;
+pub const SORA_EVENT_TITLE: u32 = 1;
+pub const SORA_EVENT_BELL: u32 = 2;
+pub const SORA_EVENT_EXIT: u32 = 3;
+pub const SORA_EVENT_CLIPBOARD_STORE: u32 = 4;
+pub const SORA_EVENT_CLIPBOARD_LOAD: u32 = 5;
+pub const SORA_EVENT_WORKING_DIRECTORY: u32 = 6;
+pub const SORA_EVENT_PROGRESS: u32 = 7;
+pub const SORA_EVENT_NOTIFICATION: u32 = 8;
+pub const SORA_EVENT_SHELL_PROMPT_START: u32 = 9;
+pub const SORA_EVENT_SHELL_COMMAND_START: u32 = 10;
+pub const SORA_EVENT_SHELL_COMMAND_EXECUTING: u32 = 11;
+pub const SORA_EVENT_SHELL_COMMAND_FINISHED: u32 = 12;
+pub const SORA_EVENT_MOUSE_SHAPE: u32 = 13;
 
 /// Per-cell attributes handed to the renderer. A subset of
-/// `alacritty_terminal`'s `Flags` plus Kero's own `SELECTED`.
-pub const KERO_CELL_INVERSE: u16 = 1 << 0;
-pub const KERO_CELL_BOLD: u16 = 1 << 1;
-pub const KERO_CELL_ITALIC: u16 = 1 << 2;
-pub const KERO_CELL_UNDERLINE: u16 = 1 << 3;
-pub const KERO_CELL_STRIKEOUT: u16 = 1 << 4;
-pub const KERO_CELL_DIM: u16 = 1 << 5;
-pub const KERO_CELL_HIDDEN: u16 = 1 << 6;
-pub const KERO_CELL_WIDE: u16 = 1 << 7;
-pub const KERO_CELL_WIDE_SPACER: u16 = 1 << 8;
-pub const KERO_CELL_SELECTED: u16 = 1 << 9;
+/// `alacritty_terminal`'s `Flags` plus Sora's own `SELECTED`.
+pub const SORA_CELL_INVERSE: u16 = 1 << 0;
+pub const SORA_CELL_BOLD: u16 = 1 << 1;
+pub const SORA_CELL_ITALIC: u16 = 1 << 2;
+pub const SORA_CELL_UNDERLINE: u16 = 1 << 3;
+pub const SORA_CELL_STRIKEOUT: u16 = 1 << 4;
+pub const SORA_CELL_DIM: u16 = 1 << 5;
+pub const SORA_CELL_HIDDEN: u16 = 1 << 6;
+pub const SORA_CELL_WIDE: u16 = 1 << 7;
+pub const SORA_CELL_WIDE_SPACER: u16 = 1 << 8;
+pub const SORA_CELL_SELECTED: u16 = 1 << 9;
 
 /// Nothing changed; the host can drop the frame entirely.
-pub const KERO_DAMAGE_NONE: u32 = 0;
+pub const SORA_DAMAGE_NONE: u32 = 0;
 /// Only the listed rows changed.
-pub const KERO_DAMAGE_PARTIAL: u32 = 1;
+pub const SORA_DAMAGE_PARTIAL: u32 = 1;
 /// Everything changed — a resize, a screen swap, a scroll.
-pub const KERO_DAMAGE_FULL: u32 = 2;
+pub const SORA_DAMAGE_FULL: u32 = 2;
 
 #[repr(C)]
-pub struct KeroDamage {
+pub struct SoraDamage {
     pub kind: u32,
     /// Viewport row indices, owned by the handle and valid only until the next
-    /// call on it. Empty unless `kind` is `KERO_DAMAGE_PARTIAL`.
+    /// call on it. Empty unless `kind` is `SORA_DAMAGE_PARTIAL`.
     pub rows: *const usize,
     pub rows_len: usize,
 }
 
-pub type KeroEventCallback =
+pub type SoraEventCallback =
     extern "C" fn(context: *mut c_void, kind: u32, data: *const u8, len: usize);
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct KeroCell {
+pub struct SoraCell {
     /// Unicode scalar; a space for an empty cell.
     pub ch: u32,
     /// Packed 0x00RRGGBB, already resolved through the palette and any OSC 4
     /// overrides — the renderer never resolves colors itself.
     pub fg: u32,
     pub bg: u32,
-    /// UTF-8 text in `KeroSnapshot::text` when this cell has combining marks.
+    /// UTF-8 text in `SoraSnapshot::text` when this cell has combining marks.
     pub text_offset: u32,
     pub text_len: u16,
     pub flags: u16,
@@ -114,7 +114,7 @@ pub struct KeroCell {
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct KeroURLRange {
+pub struct SoraURLRange {
     /// Inclusive viewport-relative cell bounds. Lines can be outside the
     /// viewport when a soft-wrapped URL begins or ends in scrollback.
     pub start_line: i32,
@@ -123,11 +123,11 @@ pub struct KeroURLRange {
     pub end_column: usize,
 }
 
-/// A theme in the form the bridge resolves colors against. Kero owns the
+/// A theme in the form the bridge resolves colors against. Sora owns the
 /// palette so Alacritty panes match Ghostty panes exactly.
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct KeroTheme {
+pub struct SoraTheme {
     pub palette: [u32; 256],
     pub foreground: u32,
     pub background: u32,
@@ -135,10 +135,10 @@ pub struct KeroTheme {
 }
 
 #[repr(C)]
-pub struct KeroSnapshot {
+pub struct SoraSnapshot {
     /// `columns * rows` cells in row-major order, owned by the handle and
     /// valid only until the next call on it.
-    pub cells: *const KeroCell,
+    pub cells: *const SoraCell,
     pub columns: usize,
     pub rows: usize,
     /// Viewport-relative cursor, or -1 when it should not be drawn.
@@ -152,7 +152,7 @@ pub struct KeroSnapshot {
     pub text: *const u8,
     pub text_len: usize,
     /// Rows scrolled back from the live prompt, and the total including
-    /// scrollback — together these drive Kero's overlay scrollbar.
+    /// scrollback — together these drive Sora's overlay scrollbar.
     pub display_offset: usize,
     pub total_lines: usize,
     pub screen_lines: usize,
@@ -160,7 +160,7 @@ pub struct KeroSnapshot {
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct KeroKittyPlacement {
+pub struct SoraKittyPlacement {
     pub placement_serial: u64,
     pub image_id: u32,
     pub placement_id: u32,
@@ -186,14 +186,14 @@ pub struct KeroKittyPlacement {
 }
 
 #[repr(C)]
-pub struct KeroKittySnapshot {
+pub struct SoraKittySnapshot {
     pub revision: u64,
-    pub placements: *const KeroKittyPlacement,
+    pub placements: *const SoraKittyPlacement,
     pub placements_len: usize,
 }
 
 #[repr(C)]
-pub struct KeroConfig {
+pub struct SoraConfig {
     /// Shell to exec, and its argv beyond argv[0].
     pub shell: *const c_char,
     pub args: *const *const c_char,
@@ -213,7 +213,7 @@ pub struct KeroConfig {
 
 /// `alacritty_terminal` handles OSC sequences that mutate its grid, but does
 /// not expose host events for working directories or desktop notifications.
-/// Termy solves this at the PTY boundary; Kero uses the same seam so the
+/// Termy solves this at the PTY boundary; Sora uses the same seam so the
 /// emulator still receives every sequence it understands while app
 /// integrations are lifted out first.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -351,7 +351,7 @@ impl OscInterceptor {
         }
 
         if let Some(name) = payload.strip_prefix("22;") {
-            // OSC 22 pointer shape. Like Ghostty, Kero takes a single CSS
+            // OSC 22 pointer shape. Like Ghostty, Sora takes a single CSS
             // cursor keyword and no kitty push/pop stack; the host owns the
             // keyword list, so the name crosses as-is and typos die there.
             return clean_terminal_text(name, 64).map(OscEvent::MouseShape);
@@ -382,7 +382,7 @@ impl OscInterceptor {
 
 /// Watches the raw stream for escape sequences the host must react to but
 /// `alacritty_terminal` will not surface. DEC private mode 2026: Alacritty
-/// buffers the enclosed bytes atomically, but Kero's host-driven cursor timer
+/// buffers the enclosed bytes atomically, but Sora's host-driven cursor timer
 /// can otherwise request a frame while that buffer is still being assembled.
 /// Pointer shape: Ghostty's stream handler moves the pointer when mouse
 /// reporting toggles and when RIS lands, and the emulator reports neither.
@@ -549,7 +549,7 @@ fn parse_progress(value: &str) -> Option<OscEvent> {
 }
 
 /// Rxvt/VTE/Ghostty desktop notifications use
-/// `OSC 777 ; notify ; title ; body ST`. Kero presents its own app title, so
+/// `OSC 777 ; notify ; title ; body ST`. Sora presents its own app title, so
 /// prefer the body and fall back to the protocol title when no body is sent.
 fn parse_osc777_notification(value: &str) -> Option<OscEvent> {
     let (title, body) = value.split_once(';').unwrap_or((value, ""));
@@ -627,7 +627,7 @@ fn hex_value(byte: u8) -> Option<u8> {
 
 // MARK: - Event proxy
 
-/// Swift's view pointer, carried to the PTY thread. Kero keeps the surface
+/// Swift's view pointer, carried to the PTY thread. Sora keeps the surface
 /// alive for as long as the handle exists, and every callback is bounced onto
 /// the main thread on the Swift side before it touches anything.
 #[derive(Clone, Copy)]
@@ -637,14 +637,14 @@ unsafe impl Sync for SwiftContext {}
 
 /// State the PTY thread needs in order to answer queries without calling into
 /// Swift: the palette for color reports, and the geometry for size reports.
-/// Per terminal, since Kero runs many panes at different sizes.
+/// Per terminal, since Sora runs many panes at different sizes.
 struct Shared {
-    theme: KeroTheme,
+    theme: SoraTheme,
     window_size: WindowSize,
     synchronized_update: bool,
     synchronized_update_ending: bool,
     synchronized_update_deadline: Option<Instant>,
-    /// OSC 52 read formatters waiting for Kero's confirmation sheet. Keeping
+    /// OSC 52 read formatters waiting for Sora's confirmation sheet. Keeping
     /// the formatter here preserves whether the request used BEL or ST.
     pending_clipboard: VecDeque<(u64, Arc<dyn Fn(&str) -> String + Sync + Send + 'static>)>,
     next_clipboard_id: u64,
@@ -652,7 +652,7 @@ struct Shared {
 
 #[derive(Clone)]
 struct Proxy {
-    callback: KeroEventCallback,
+    callback: SoraEventCallback,
     context: SwiftContext,
     /// Filled once the event loop exists. Replies that the terminal generates
     /// on its own (DSR, color and size queries) are written straight back here
@@ -706,23 +706,23 @@ impl Proxy {
     fn emit_osc(&self, event: OscEvent) {
         match event {
             OscEvent::WorkingDirectory(path) => {
-                self.emit(KERO_EVENT_WORKING_DIRECTORY, path.as_bytes())
+                self.emit(SORA_EVENT_WORKING_DIRECTORY, path.as_bytes())
             }
             OscEvent::Progress { state, percent } => self.emit(
-                KERO_EVENT_PROGRESS,
+                SORA_EVENT_PROGRESS,
                 &[state, percent.unwrap_or(0), u8::from(percent.is_some())],
             ),
             OscEvent::Notification(message) => {
-                self.emit(KERO_EVENT_NOTIFICATION, message.as_bytes())
+                self.emit(SORA_EVENT_NOTIFICATION, message.as_bytes())
             }
-            OscEvent::ShellPromptStart => self.emit(KERO_EVENT_SHELL_PROMPT_START, &[]),
-            OscEvent::ShellCommandStart => self.emit(KERO_EVENT_SHELL_COMMAND_START, &[]),
-            OscEvent::ShellCommandExecuting => self.emit(KERO_EVENT_SHELL_COMMAND_EXECUTING, &[]),
+            OscEvent::ShellPromptStart => self.emit(SORA_EVENT_SHELL_PROMPT_START, &[]),
+            OscEvent::ShellCommandStart => self.emit(SORA_EVENT_SHELL_COMMAND_START, &[]),
+            OscEvent::ShellCommandExecuting => self.emit(SORA_EVENT_SHELL_COMMAND_EXECUTING, &[]),
             OscEvent::ShellCommandFinished(exit_code) => self.emit(
-                KERO_EVENT_SHELL_COMMAND_FINISHED,
+                SORA_EVENT_SHELL_COMMAND_FINISHED,
                 &exit_code.unwrap_or(-1).to_le_bytes(),
             ),
-            OscEvent::MouseShape(name) => self.emit(KERO_EVENT_MOUSE_SHAPE, name.as_bytes()),
+            OscEvent::MouseShape(name) => self.emit(SORA_EVENT_MOUSE_SHAPE, name.as_bytes()),
         }
     }
 }
@@ -862,16 +862,16 @@ impl EventListener for Proxy {
         match event {
             Event::Wakeup => {
                 self.finish_synchronized_update_if_ready();
-                self.emit(KERO_EVENT_WAKEUP, &[]);
+                self.emit(SORA_EVENT_WAKEUP, &[]);
             }
-            Event::Bell => self.emit(KERO_EVENT_BELL, &[]),
-            Event::Title(title) => self.emit(KERO_EVENT_TITLE, title.as_bytes()),
-            // Kero derives the tab title from the shell and directory, so a
+            Event::Bell => self.emit(SORA_EVENT_BELL, &[]),
+            Event::Title(title) => self.emit(SORA_EVENT_TITLE, title.as_bytes()),
+            // Sora derives the tab title from the shell and directory, so a
             // reset is simply the absence of a title.
-            Event::ResetTitle => self.emit(KERO_EVENT_TITLE, &[]),
-            Event::Exit | Event::ChildExit(_) => self.emit(KERO_EVENT_EXIT, &[]),
+            Event::ResetTitle => self.emit(SORA_EVENT_TITLE, &[]),
+            Event::Exit | Event::ChildExit(_) => self.emit(SORA_EVENT_EXIT, &[]),
             Event::ClipboardStore(_, text) => {
-                self.emit(KERO_EVENT_CLIPBOARD_STORE, text.as_bytes())
+                self.emit(SORA_EVENT_CLIPBOARD_STORE, text.as_bytes())
             }
             Event::ClipboardLoad(_, format) => {
                 let id = {
@@ -886,7 +886,7 @@ impl EventListener for Proxy {
                     shared.pending_clipboard.push_back((id, format));
                     id
                 };
-                self.emit(KERO_EVENT_CLIPBOARD_LOAD, &id.to_le_bytes());
+                self.emit(SORA_EVENT_CLIPBOARD_LOAD, &id.to_le_bytes());
             }
             Event::PtyWrite(text) => self.write_pty(text),
             Event::ColorRequest(index, format) => {
@@ -923,18 +923,18 @@ impl Dimensions for TermSize {
     }
 }
 
-pub struct KeroTerminal {
+pub struct SoraTerminal {
     term: Arc<FairMutex<Term<Proxy>>>,
     notifier: GraphicsNotifier,
     shared: Arc<FairMutex<Shared>>,
     kitty_graphics: Arc<FairMutex<KittyGraphicsStore>>,
     kitty_graphics_size: Arc<FairMutex<KittyGraphicsSize>>,
-    cells: Vec<KeroCell>,
+    cells: Vec<SoraCell>,
     /// Variable-length UTF-8 cell contents for combining character clusters.
     cell_text: Vec<u8>,
     child_pid: i32,
     /// Kept so the host can ask which process group is in the foreground —
-    /// that is how Kero tells a shell at its prompt from a running TUI.
+    /// that is how Sora tells a shell at its prompt from a running TUI.
     master_fd: RawFd,
     /// Every match of the active find, in buffer order, and which one is
     /// selected. Collected up front so the host can show a total.
@@ -945,7 +945,7 @@ pub struct KeroTerminal {
     url_regex: RegexSearch,
     /// Reused per frame so damage reporting does not allocate.
     dirty_rows: Vec<usize>,
-    kitty_placements: Vec<KeroKittyPlacement>,
+    kitty_placements: Vec<SoraKittyPlacement>,
     /// Retains each placement's PNG while C pointers are visible to Swift.
     kitty_images: Vec<Arc<[u8]>>,
     last_kitty_damage_revision: u64,
@@ -973,7 +973,7 @@ fn dim(value: u32) -> u32 {
 }
 
 /// Resolves a `Colors` index — which is `NamedColor as usize` — to the theme.
-fn color_for_index(index: usize, theme: &KeroTheme) -> u32 {
+fn color_for_index(index: usize, theme: &SoraTheme) -> u32 {
     match index {
         0..=255 => theme.palette[index],
         i if i == NamedColor::Foreground as usize => theme.foreground,
@@ -989,8 +989,8 @@ fn color_for_index(index: usize, theme: &KeroTheme) -> u32 {
 }
 
 /// OSC 4 / OSC 10-11 overrides win over the theme, exactly as they do in
-/// Kero's Ghostty panes.
-fn resolve(color: Color, colors: &Colors, theme: &KeroTheme) -> u32 {
+/// Sora's Ghostty panes.
+fn resolve(color: Color, colors: &Colors, theme: &SoraTheme) -> u32 {
     match color {
         Color::Spec(rgb) => pack(rgb),
         Color::Indexed(index) => colors[index as usize]
@@ -1027,12 +1027,12 @@ unsafe fn cstr_array(pointer: *const *const c_char, len: usize) -> Vec<String> {
 /// Every pointer in `config` must be valid for the duration of the call, and
 /// `context` must outlive the returned handle.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_new(
-    config: *const KeroConfig,
-    theme: *const KeroTheme,
-    callback: KeroEventCallback,
+pub unsafe extern "C" fn sora_alacritty_new(
+    config: *const SoraConfig,
+    theme: *const SoraTheme,
+    callback: SoraEventCallback,
     context: *mut c_void,
-) -> *mut KeroTerminal {
+) -> *mut SoraTerminal {
     if config.is_null() || theme.is_null() {
         return std::ptr::null_mut();
     }
@@ -1086,7 +1086,7 @@ pub unsafe extern "C" fn kero_alacritty_new(
             shape: CursorShape::Block,
             blinking: true,
         },
-        // Kero owns clipboard policy at the app level. Reads are enabled in
+        // Sora owns clipboard policy at the app level. Reads are enabled in
         // the emulator only so the host can present its confirmation sheet;
         // the bridge writes nothing back until that request is approved.
         osc52: Osc52::CopyPaste,
@@ -1131,7 +1131,7 @@ pub unsafe extern "C" fn kero_alacritty_new(
     let _ = proxy.sender.set(sender.clone());
     event_loop.spawn();
 
-    Box::into_raw(Box::new(KeroTerminal {
+    Box::into_raw(Box::new(SoraTerminal {
         term,
         notifier: GraphicsNotifier(sender),
         shared,
@@ -1155,9 +1155,9 @@ pub unsafe extern "C" fn kero_alacritty_new(
 /// Stops the read loop and releases the handle.
 ///
 /// # Safety
-/// `handle` must come from `kero_alacritty_new` and must not be used after.
+/// `handle` must come from `sora_alacritty_new` and must not be used after.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_free(handle: *mut KeroTerminal) {
+pub unsafe extern "C" fn sora_alacritty_free(handle: *mut SoraTerminal) {
     if handle.is_null() {
         return;
     }
@@ -1165,12 +1165,12 @@ pub unsafe extern "C" fn kero_alacritty_free(handle: *mut KeroTerminal) {
     let _ = terminal.notifier.0.send(GraphicsMsg::Shutdown);
 }
 
-/// PID of the shell, for Kero's process panel and its teardown signals.
+/// PID of the shell, for Sora's process panel and its teardown signals.
 ///
 /// # Safety
-/// `handle` must be a live handle from `kero_alacritty_new`.
+/// `handle` must be a live handle from `sora_alacritty_new`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_child_pid(handle: *mut KeroTerminal) -> i32 {
+pub unsafe extern "C" fn sora_alacritty_child_pid(handle: *mut SoraTerminal) -> i32 {
     if handle.is_null() {
         return 0;
     }
@@ -1181,9 +1181,9 @@ pub unsafe extern "C" fn kero_alacritty_child_pid(handle: *mut KeroTerminal) -> 
 /// than the shell that launched it. Falls back to the shell's own PID.
 ///
 /// # Safety
-/// `handle` must be a live handle from `kero_alacritty_new`.
+/// `handle` must be a live handle from `sora_alacritty_new`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_foreground_pid(handle: *mut KeroTerminal) -> i32 {
+pub unsafe extern "C" fn sora_alacritty_foreground_pid(handle: *mut SoraTerminal) -> i32 {
     if handle.is_null() {
         return 0;
     }
@@ -1206,8 +1206,8 @@ extern "C" {
 /// # Safety
 /// `handle` must be live and `bytes` valid for `len`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_write(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_write(
+    handle: *mut SoraTerminal,
     bytes: *const u8,
     len: usize,
 ) {
@@ -1227,8 +1227,8 @@ pub unsafe extern "C" fn kero_alacritty_write(
 /// # Safety
 /// `handle` must be live and `bytes` valid for `len`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_write_control(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_write_control(
+    handle: *mut SoraTerminal,
     bytes: *const u8,
     len: usize,
 ) {
@@ -1240,15 +1240,15 @@ pub unsafe extern "C" fn kero_alacritty_write_control(
     terminal.notifier.notify(payload);
 }
 
-/// Completes a pending OSC 52 clipboard read after Kero's confirmation sheet
+/// Completes a pending OSC 52 clipboard read after Sora's confirmation sheet
 /// has resolved it. Denied requests are removed without ever writing clipboard
 /// contents to the PTY.
 ///
 /// # Safety
 /// `handle` must be live and `bytes` valid for `len` when non-null.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_resolve_clipboard(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_resolve_clipboard(
+    handle: *mut SoraTerminal,
     request_id: u64,
     bytes: *const u8,
     len: usize,
@@ -1287,8 +1287,8 @@ pub unsafe extern "C" fn kero_alacritty_resolve_clipboard(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_resize(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_resize(
+    handle: *mut SoraTerminal,
     columns: u16,
     rows: u16,
     cell_width: u16,
@@ -1325,7 +1325,7 @@ pub unsafe extern "C" fn kero_alacritty_resize(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_scroll(handle: *mut KeroTerminal, delta: i32) {
+pub unsafe extern "C" fn sora_alacritty_scroll(handle: *mut SoraTerminal, delta: i32) {
     if handle.is_null() {
         return;
     }
@@ -1337,7 +1337,7 @@ pub unsafe extern "C" fn kero_alacritty_scroll(handle: *mut KeroTerminal, delta:
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_scroll_to_offset(handle: *mut KeroTerminal, offset: usize) {
+pub unsafe extern "C" fn sora_alacritty_scroll_to_offset(handle: *mut SoraTerminal, offset: usize) {
     if handle.is_null() {
         return;
     }
@@ -1350,9 +1350,9 @@ pub unsafe extern "C" fn kero_alacritty_scroll_to_offset(handle: *mut KeroTermin
 /// # Safety
 /// `handle` must be live and `theme` valid for the call.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_set_theme(
-    handle: *mut KeroTerminal,
-    theme: *const KeroTheme,
+pub unsafe extern "C" fn sora_alacritty_set_theme(
+    handle: *mut SoraTerminal,
+    theme: *const SoraTheme,
 ) {
     if handle.is_null() || theme.is_null() {
         return;
@@ -1368,8 +1368,8 @@ pub unsafe extern "C" fn kero_alacritty_set_theme(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_selection_start(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_selection_start(
+    handle: *mut SoraTerminal,
     line: i32,
     column: usize,
     kind: u32,
@@ -1394,8 +1394,8 @@ pub unsafe extern "C" fn kero_alacritty_selection_start(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_selection_update(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_selection_update(
+    handle: *mut SoraTerminal,
     line: i32,
     column: usize,
     right_half: bool,
@@ -1416,7 +1416,7 @@ pub unsafe extern "C" fn kero_alacritty_selection_update(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_selection_clear(handle: *mut KeroTerminal) {
+pub unsafe extern "C" fn sora_alacritty_selection_clear(handle: *mut SoraTerminal) {
     if handle.is_null() {
         return;
     }
@@ -1428,7 +1428,7 @@ pub unsafe extern "C" fn kero_alacritty_selection_clear(handle: *mut KeroTermina
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_select_all(handle: *mut KeroTerminal) {
+pub unsafe extern "C" fn sora_alacritty_select_all(handle: *mut SoraTerminal) {
     if handle.is_null() {
         return;
     }
@@ -1446,7 +1446,7 @@ pub unsafe extern "C" fn kero_alacritty_select_all(handle: *mut KeroTerminal) {
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_has_selection(handle: *mut KeroTerminal) -> bool {
+pub unsafe extern "C" fn sora_alacritty_has_selection(handle: *mut SoraTerminal) -> bool {
     if handle.is_null() {
         return false;
     }
@@ -1463,8 +1463,8 @@ pub unsafe extern "C" fn kero_alacritty_has_selection(handle: *mut KeroTerminal)
 /// # Safety
 /// `handle` must be live and `buffer` valid for `capacity` bytes.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_selection_text(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_selection_text(
+    handle: *mut SoraTerminal,
     buffer: *mut u8,
     capacity: usize,
 ) -> usize {
@@ -1489,14 +1489,14 @@ pub unsafe extern "C" fn kero_alacritty_selection_text(
 /// Counts every match of `needle` in the screen and scrollback, and selects
 /// the one nearest the viewport.
 ///
-/// The needle is matched literally: Kero's find bar is a plain text field, so
+/// The needle is matched literally: Sora's find bar is a plain text field, so
 /// regex metacharacters in it are escaped rather than interpreted.
 ///
 /// # Safety
 /// `handle` must be live and `needle` a valid C string.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_find(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_find(
+    handle: *mut SoraTerminal,
     needle: *const c_char,
 ) -> usize {
     if handle.is_null() {
@@ -1534,8 +1534,8 @@ pub unsafe extern "C" fn kero_alacritty_find(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_find_step(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_find_step(
+    handle: *mut SoraTerminal,
     forward: bool,
 ) -> isize {
     if handle.is_null() {
@@ -1567,7 +1567,7 @@ pub unsafe extern "C" fn kero_alacritty_find_step(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_find_end(handle: *mut KeroTerminal) {
+pub unsafe extern "C" fn sora_alacritty_find_end(handle: *mut SoraTerminal) {
     if handle.is_null() {
         return;
     }
@@ -1600,22 +1600,22 @@ struct VtStyle {
     hyperlink: Option<String>,
 }
 
-fn style_for(cell: &Cell, colors: &Colors, theme: &KeroTheme) -> VtStyle {
+fn style_for(cell: &Cell, colors: &Colors, theme: &SoraTheme) -> VtStyle {
     let mut flags = 0;
     for (source, target) in [
-        (Flags::BOLD, KERO_CELL_BOLD),
-        (Flags::ITALIC, KERO_CELL_ITALIC),
-        (Flags::STRIKEOUT, KERO_CELL_STRIKEOUT),
-        (Flags::DIM, KERO_CELL_DIM),
-        (Flags::HIDDEN, KERO_CELL_HIDDEN),
-        (Flags::INVERSE, KERO_CELL_INVERSE),
+        (Flags::BOLD, SORA_CELL_BOLD),
+        (Flags::ITALIC, SORA_CELL_ITALIC),
+        (Flags::STRIKEOUT, SORA_CELL_STRIKEOUT),
+        (Flags::DIM, SORA_CELL_DIM),
+        (Flags::HIDDEN, SORA_CELL_HIDDEN),
+        (Flags::INVERSE, SORA_CELL_INVERSE),
     ] {
         if cell.flags.contains(source) {
             flags |= target;
         }
     }
     if cell.flags.intersects(Flags::ALL_UNDERLINES) {
-        flags |= KERO_CELL_UNDERLINE;
+        flags |= SORA_CELL_UNDERLINE;
     }
     VtStyle {
         foreground: resolve(cell.fg, colors, theme),
@@ -1634,13 +1634,13 @@ fn push_sgr(output: &mut Vec<u8>, style: &VtStyle) {
         format!("48;2;{};{};{}", background.r, background.g, background.b),
     ];
     for (flag, code) in [
-        (KERO_CELL_BOLD, "1"),
-        (KERO_CELL_DIM, "2"),
-        (KERO_CELL_ITALIC, "3"),
-        (KERO_CELL_UNDERLINE, "4"),
-        (KERO_CELL_INVERSE, "7"),
-        (KERO_CELL_HIDDEN, "8"),
-        (KERO_CELL_STRIKEOUT, "9"),
+        (SORA_CELL_BOLD, "1"),
+        (SORA_CELL_DIM, "2"),
+        (SORA_CELL_ITALIC, "3"),
+        (SORA_CELL_UNDERLINE, "4"),
+        (SORA_CELL_INVERSE, "7"),
+        (SORA_CELL_HIDDEN, "8"),
+        (SORA_CELL_STRIKEOUT, "9"),
     ] {
         if style.flags & flag != 0 {
             codes.push(code.to_owned());
@@ -1681,7 +1681,7 @@ fn cell_has_visible_content(cell: &Cell) -> bool {
 /// reflow them at its current width.
 fn serialize_vt<T: EventListener>(
     term: &Term<T>,
-    theme: &KeroTheme,
+    theme: &SoraTheme,
     scrollback_only: bool,
 ) -> Vec<u8> {
     let first_line = term.topmost_line();
@@ -1764,13 +1764,13 @@ fn serialize_vt<T: EventListener>(
 
 /// Writes the whole buffer — scrollback and screen — as a styled VT stream
 /// into `buffer`, using the same length protocol as selection text. This backs
-/// Kero's history capture and its tab-switcher previews.
+/// Sora's history capture and its tab-switcher previews.
 ///
 /// # Safety
 /// `handle` must be live and `buffer` valid for `capacity` bytes.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_buffer_text(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_buffer_text(
+    handle: *mut SoraTerminal,
     scrollback_only: bool,
     buffer: *mut u8,
     capacity: usize,
@@ -1914,11 +1914,11 @@ fn hyperlink_url_at<T: EventListener>(term: &Term<T>, point: Point) -> Option<(S
 /// `handle` must be live; `range` must be null or valid; and `buffer` must be
 /// null or valid for `capacity` bytes.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_url_at(
-    handle: *mut KeroTerminal,
+pub unsafe extern "C" fn sora_alacritty_url_at(
+    handle: *mut SoraTerminal,
     line: i32,
     column: usize,
-    range: *mut KeroURLRange,
+    range: *mut SoraURLRange,
     buffer: *mut u8,
     capacity: usize,
 ) -> usize {
@@ -1938,7 +1938,7 @@ pub unsafe extern "C" fn kero_alacritty_url_at(
         return 0;
     };
     if !range.is_null() {
-        *range = KeroURLRange {
+        *range = SoraURLRange {
             start_line: bounds.start().line.0 + offset as i32,
             start_column: bounds.start().column.0,
             end_line: bounds.end().line.0 + offset as i32,
@@ -1953,13 +1953,13 @@ pub unsafe extern "C" fn kero_alacritty_url_at(
     bytes.len()
 }
 
-/// Whether the primary screen has rows above the viewport — Kero uses this to
+/// Whether the primary screen has rows above the viewport — Sora uses this to
 /// tell a scrolled shell from a full-screen TUI.
 ///
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_has_scrollback(handle: *mut KeroTerminal) -> bool {
+pub unsafe extern "C" fn sora_alacritty_has_scrollback(handle: *mut SoraTerminal) -> bool {
     if handle.is_null() {
         return false;
     }
@@ -1972,7 +1972,7 @@ pub unsafe extern "C" fn kero_alacritty_has_scrollback(handle: *mut KeroTerminal
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_clear(handle: *mut KeroTerminal) {
+pub unsafe extern "C" fn sora_alacritty_clear(handle: *mut SoraTerminal) {
     if handle.is_null() {
         return;
     }
@@ -1992,7 +1992,7 @@ pub unsafe extern "C" fn kero_alacritty_clear(handle: *mut KeroTerminal) {
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_synchronized_update(handle: *mut KeroTerminal) -> bool {
+pub unsafe extern "C" fn sora_alacritty_synchronized_update(handle: *mut SoraTerminal) -> bool {
     if handle.is_null() {
         return false;
     }
@@ -2074,12 +2074,12 @@ mod tests {
         assert!(scanner.process(b"\x1b]0;\x1bc\x07").is_empty());
     }
 
-    fn theme() -> KeroTheme {
+    fn theme() -> SoraTheme {
         let mut palette = [0; 256];
         for (index, color) in palette.iter_mut().enumerate() {
             *color = index as u32 * 0x010101;
         }
-        KeroTheme {
+        SoraTheme {
             palette,
             foreground: 0xeeeeee,
             background: 0x111111,
@@ -2150,11 +2150,11 @@ mod tests {
     #[test]
     fn plain_url_lookup_matches_local_file_paths() {
         for path in [
-            "/tmp/kero/main.swift",
-            "~/Developer/kero/main.swift",
+            "/tmp/sora/main.swift",
+            "~/Developer/sora/main.swift",
             "./Sources/main.swift",
             "../Shared/main.swift",
-            "Sources/Kero/main.swift:42:8",
+            "Sources/Sora/main.swift:42:8",
         ] {
             let term = parse(path.as_bytes());
             assert_eq!(
@@ -2185,21 +2185,21 @@ mod tests {
 
     #[test]
     fn history_export_preserves_osc8_links() {
-        let term = parse(b"\x1b]8;;https://kero.sh\x1b\\Kero\x1b]8;;\x1b\\");
+        let term = parse(b"\x1b]8;;https://sora.sh\x1b\\Sora\x1b]8;;\x1b\\");
         let output = serialize_vt(&term, &theme(), false);
         let text = String::from_utf8(output).unwrap();
 
-        assert!(text.contains("\x1b]8;;https://kero.sh\x1b\\"));
-        assert!(text.contains("Kero"));
+        assert!(text.contains("\x1b]8;;https://sora.sh\x1b\\"));
+        assert!(text.contains("Sora"));
         assert!(text.contains("\x1b]8;;\x1b\\"));
     }
 
     #[test]
     fn osc8_url_lookup_returns_visible_cell_bounds() {
-        let term = parse(b"x\x1b]8;;https://kero.sh\x1b\\Kero\x1b]8;;\x1b\\ y");
+        let term = parse(b"x\x1b]8;;https://sora.sh\x1b\\Sora\x1b]8;;\x1b\\ y");
         let (url, bounds) = hyperlink_url_at(&term, Point::new(Line(0), Column(2))).unwrap();
 
-        assert_eq!(url, "https://kero.sh");
+        assert_eq!(url, "https://sora.sh");
         assert_eq!(
             bounds,
             Point::new(Line(0), Column(1))..=Point::new(Line(0), Column(4))
@@ -2308,10 +2308,10 @@ mod tests {
     #[test]
     fn osc_interceptor_preserves_sequences_owned_by_alacritty() {
         let mut interceptor = OscInterceptor::default();
-        let input = b"\x1b]8;;https://kero.sh\x1b\\Kero\x1b]8;;\x1b\\";
+        let input = b"\x1b]8;;https://sora.sh\x1b\\Sora\x1b]8;;\x1b\\";
         let (output, events) = intercept(&mut interceptor, input);
 
-        assert_eq!(output, b"\x1b]8;;https://kero.sh\x07Kero\x1b]8;;\x07");
+        assert_eq!(output, b"\x1b]8;;https://sora.sh\x07Sora\x1b]8;;\x07");
         assert!(events.is_empty());
     }
 
@@ -2361,11 +2361,11 @@ mod tests {
 /// FFI. The row list belongs to the handle and is valid until the next call.
 ///
 /// # Safety
-/// `handle` must be live and `out` a valid `KeroDamage`.
+/// `handle` must be live and `out` a valid `SoraDamage`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_take_damage(
-    handle: *mut KeroTerminal,
-    out: *mut KeroDamage,
+pub unsafe extern "C" fn sora_alacritty_take_damage(
+    handle: *mut SoraTerminal,
+    out: *mut SoraDamage,
 ) {
     if handle.is_null() || out.is_null() {
         return;
@@ -2375,15 +2375,15 @@ pub unsafe extern "C" fn kero_alacritty_take_damage(
 
     let mut term = terminal.term.lock();
     let mut kind = match term.damage() {
-        TermDamage::Full => KERO_DAMAGE_FULL,
+        TermDamage::Full => SORA_DAMAGE_FULL,
         TermDamage::Partial(iter) => {
             for bounds in iter {
                 terminal.dirty_rows.push(bounds.line);
             }
             if terminal.dirty_rows.is_empty() {
-                KERO_DAMAGE_NONE
+                SORA_DAMAGE_NONE
             } else {
-                KERO_DAMAGE_PARTIAL
+                SORA_DAMAGE_PARTIAL
             }
         }
     };
@@ -2392,11 +2392,11 @@ pub unsafe extern "C" fn kero_alacritty_take_damage(
     let graphics_revision = terminal.kitty_graphics.lock().revision;
     if graphics_revision != terminal.last_kitty_damage_revision {
         terminal.last_kitty_damage_revision = graphics_revision;
-        kind = KERO_DAMAGE_FULL;
+        kind = SORA_DAMAGE_FULL;
         terminal.dirty_rows.clear();
     }
 
-    *out = KeroDamage {
+    *out = SoraDamage {
         kind,
         rows: terminal.dirty_rows.as_ptr(),
         rows_len: terminal.dirty_rows.len(),
@@ -2409,11 +2409,11 @@ pub unsafe extern "C" fn kero_alacritty_take_damage(
 /// call on it, which keeps a redraw from allocating.
 ///
 /// # Safety
-/// `handle` must be live and `out` must be a valid `KeroSnapshot`.
+/// `handle` must be live and `out` must be a valid `SoraSnapshot`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_snapshot(
-    handle: *mut KeroTerminal,
-    out: *mut KeroSnapshot,
+pub unsafe extern "C" fn sora_alacritty_snapshot(
+    handle: *mut SoraTerminal,
+    out: *mut SoraSnapshot,
 ) {
     if handle.is_null() || out.is_null() {
         return;
@@ -2432,7 +2432,7 @@ pub unsafe extern "C" fn kero_alacritty_snapshot(
     terminal.cell_text.clear();
     terminal.cells.resize(
         columns * screen_lines,
-        KeroCell {
+        SoraCell {
             ch: u32::from(' '),
             fg: theme.foreground,
             bg: background,
@@ -2461,34 +2461,34 @@ pub unsafe extern "C" fn kero_alacritty_snapshot(
         let mut flags = 0u16;
         let source = cell.flags;
         if source.contains(Flags::INVERSE) {
-            flags |= KERO_CELL_INVERSE;
+            flags |= SORA_CELL_INVERSE;
         }
         if source.contains(Flags::BOLD) {
-            flags |= KERO_CELL_BOLD;
+            flags |= SORA_CELL_BOLD;
         }
         if source.contains(Flags::ITALIC) {
-            flags |= KERO_CELL_ITALIC;
+            flags |= SORA_CELL_ITALIC;
         }
         if source.intersects(Flags::ALL_UNDERLINES) {
-            flags |= KERO_CELL_UNDERLINE;
+            flags |= SORA_CELL_UNDERLINE;
         }
         if source.contains(Flags::STRIKEOUT) {
-            flags |= KERO_CELL_STRIKEOUT;
+            flags |= SORA_CELL_STRIKEOUT;
         }
         if source.contains(Flags::DIM) {
-            flags |= KERO_CELL_DIM;
+            flags |= SORA_CELL_DIM;
         }
         if source.contains(Flags::HIDDEN) {
-            flags |= KERO_CELL_HIDDEN;
+            flags |= SORA_CELL_HIDDEN;
         }
         if source.contains(Flags::WIDE_CHAR) {
-            flags |= KERO_CELL_WIDE;
+            flags |= SORA_CELL_WIDE;
         }
         if source.intersects(Flags::WIDE_CHAR_SPACER | Flags::LEADING_WIDE_CHAR_SPACER) {
-            flags |= KERO_CELL_WIDE_SPACER;
+            flags |= SORA_CELL_WIDE_SPACER;
         }
         if selection.is_some_and(|range| range.contains(item.point)) {
-            flags |= KERO_CELL_SELECTED;
+            flags |= SORA_CELL_SELECTED;
         }
 
         let (text_offset, text_len) =
@@ -2514,7 +2514,7 @@ pub unsafe extern "C" fn kero_alacritty_snapshot(
                 (0, 0)
             };
 
-        terminal.cells[line as usize * columns + column] = KeroCell {
+        terminal.cells[line as usize * columns + column] = SoraCell {
             ch: u32::from(cell.c),
             fg: resolve(cell.fg, colors, &theme),
             bg: resolve(cell.bg, colors, &theme),
@@ -2534,7 +2534,7 @@ pub unsafe extern "C" fn kero_alacritty_snapshot(
         (cursor.point.line.0 as isize, cursor.point.column.0 as isize)
     };
 
-    *out = KeroSnapshot {
+    *out = SoraSnapshot {
         cells: terminal.cells.as_ptr(),
         columns,
         rows: screen_lines,
@@ -2564,11 +2564,11 @@ pub unsafe extern "C" fn kero_alacritty_snapshot(
 /// handle and remain valid until its next FFI call.
 ///
 /// # Safety
-/// `handle` must be live and `out` must be a valid `KeroKittySnapshot`.
+/// `handle` must be live and `out` must be a valid `SoraKittySnapshot`.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_kitty_snapshot(
-    handle: *mut KeroTerminal,
-    out: *mut KeroKittySnapshot,
+pub unsafe extern "C" fn sora_alacritty_kitty_snapshot(
+    handle: *mut SoraTerminal,
+    out: *mut SoraKittySnapshot,
 ) {
     if handle.is_null() || out.is_null() {
         return;
@@ -2611,7 +2611,7 @@ pub unsafe extern "C" fn kero_alacritty_kitty_snapshot(
             .kitty_images
             .last()
             .expect("image was retained for the placement");
-        terminal.kitty_placements.push(KeroKittyPlacement {
+        terminal.kitty_placements.push(SoraKittyPlacement {
             placement_serial: placement.placement_serial,
             image_id: placement.image_id,
             placement_id: placement.placement_id,
@@ -2636,7 +2636,7 @@ pub unsafe extern "C" fn kero_alacritty_kitty_snapshot(
         });
     }
 
-    *out = KeroKittySnapshot {
+    *out = SoraKittySnapshot {
         revision,
         placements: terminal.kitty_placements.as_ptr(),
         placements_len: terminal.kitty_placements.len(),
@@ -2649,7 +2649,7 @@ pub unsafe extern "C" fn kero_alacritty_kitty_snapshot(
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_mode(handle: *mut KeroTerminal) -> u32 {
+pub unsafe extern "C" fn sora_alacritty_mode(handle: *mut SoraTerminal) -> u32 {
     if handle.is_null() {
         return 0;
     }
@@ -2697,7 +2697,7 @@ pub unsafe extern "C" fn kero_alacritty_mode(handle: *mut KeroTerminal) -> u32 {
 /// # Safety
 /// `handle` must be live.
 #[no_mangle]
-pub unsafe extern "C" fn kero_alacritty_mark_exited(handle: *mut KeroTerminal) {
+pub unsafe extern "C" fn sora_alacritty_mark_exited(handle: *mut SoraTerminal) {
     if handle.is_null() {
         return;
     }

@@ -27,7 +27,7 @@ open class STTextLayoutManager: NSTextLayoutManager {
         }
     }
 
-    // kero patch: guard rendering attributes against empty ranges.
+    // sora patch: guard rendering attributes against empty ranges.
     //
     // Applying a rendering (temporary) attribute over an empty NSTextRange
     // crashes deep inside TextKit on macOS 15/26 — `_NSTextRunStorage` builds an

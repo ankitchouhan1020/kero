@@ -3,7 +3,7 @@
 ## Supported Versions
 
 Only the latest release of Sora receives security fixes. Updates ship
-through the in-app updater and https://kero.sh.
+through the in-app updater and https://sora.ankitchouhan.dev.
 
 ## Reporting a Vulnerability
 

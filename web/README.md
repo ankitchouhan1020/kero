@@ -37,7 +37,7 @@ maintainer-owned Cloudflare account selected by Wrangler and publish to both
 ## Notes
 
 - The theme lives in [`src/styles/app.css`](src/styles/app.css) — a GitHub-dark
-  palette that mirrors the macOS app (`kero/Theme.swift`).
+  palette that mirrors the macOS app (`Sora/Theme.swift`).
 - Add more components with `bunx shadcn@latest add <name>` — the project is
   already configured for Base UI (`components.json` → `"style": "base-nova"`).
 - The Worker reads the latest version and download URL from the Sparkle appcast;
